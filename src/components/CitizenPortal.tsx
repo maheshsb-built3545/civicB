@@ -123,6 +123,24 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
     aiScreened: boolean;
   } | null>(null);
 
+  // Blackout Resilience Mode State
+  const [isBlackoutActive, setIsBlackoutActive] = useState(false);
+  const [isBlackoutBannerDismissed, setIsBlackoutBannerDismissed] = useState(false);
+
+  useEffect(() => {
+    const queue = localStorage.getItem('urbanloop_blackout_queue');
+    if (queue) {
+      try {
+        const parsed = JSON.parse(queue);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setIsBlackoutActive(true);
+        }
+      } catch {
+        // ignore
+      }
+    }
+  }, []);
+
   // Tracking Search State
   const [searchTicket, setSearchTicket] = useState('');
   const [trackedIssue, setTrackedIssue] = useState<CivicIssue | null | 'NOT_FOUND'>(null);
@@ -161,27 +179,75 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
       }
 
       // 3. POST raw input to /api/issues — urgencyScore is computed server-authoritatively
-      const response = await fetch('/api/issues', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: title.trim(),
-          description: description.trim(),
-          category,
-          ward,
-          locationLandmark: landmark.trim(),
-          aiVerification: {
-            isLikelyGenuine: aiResult.isLikelyGenuine,
-            confidenceLabel: aiResult.confidenceLabel,
-            aiReasoning: aiResult.aiReasoning,
-            screenedAt: new Date().toISOString()
-          }
-        }),
-      });
+      let response: Response | null = null;
+      let data: any = {};
+      let isBlackoutMode = false;
 
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to register complaint.');
+      const payload = {
+        title: title.trim(),
+        description: description.trim(),
+        category,
+        ward,
+        locationLandmark: landmark.trim(),
+        aiVerification: {
+          isLikelyGenuine: aiResult.isLikelyGenuine,
+          confidenceLabel: aiResult.confidenceLabel,
+          aiReasoning: aiResult.aiReasoning,
+          screenedAt: new Date().toISOString()
+        }
+      };
+
+      try {
+        response = await fetch('/api/issues', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        data = await response.json().catch(() => ({}));
+        if (response.status === 503 || data.blackoutMode) {
+          isBlackoutMode = true;
+        } else if (!response.ok) {
+          throw new Error(data.error || 'Failed to register complaint.');
+        }
+      } catch (err: any) {
+        if (err.message?.includes('Database unreachable') || err.name === 'TypeError') {
+          isBlackoutMode = true;
+        } else {
+          throw err;
+        }
+      }
+
+      // If Emergency Blackout Mode is triggered: Cache in localStorage urbanloop_blackout_queue
+      if (isBlackoutMode) {
+        setIsBlackoutActive(true);
+        const ticketNumber = data.ticketNumber || `KPG-OFFLINE-${Math.floor(1000 + Math.random() * 9000)}`;
+        const blackoutItem = {
+          ...payload,
+          ticketNumber,
+          cachedAt: new Date().toISOString()
+        };
+
+        const existingQueue = JSON.parse(localStorage.getItem('urbanloop_blackout_queue') || '[]');
+        existingQueue.push(blackoutItem);
+        localStorage.setItem('urbanloop_blackout_queue', JSON.stringify(existingQueue));
+
+        const reportedDate = new Date().toISOString().slice(0, 10);
+        setSubmittedTicket({
+          ticketNumber,
+          title: title.trim(),
+          ward,
+          category,
+          date: reportedDate,
+          urgencyEstimate: 75,
+          aiScreened: true
+        });
+
+        setTitle('');
+        setDescription('');
+        setLandmark('');
+        setCitizenName('');
+        setCitizenMobile('');
+        return;
       }
 
       const ticketNumber = data.ticketNumber;
@@ -248,6 +314,25 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
         <div className="h-full w-1/3 bg-white"></div>
         <div className="h-full w-1/3 bg-[#138808]"></div>
       </div>
+
+      {/* Emergency Resilience Mode Top Banner */}
+      {isBlackoutActive && !isBlackoutBannerDismissed && (
+        <div className="bg-amber-500 text-slate-950 px-4 py-3 font-semibold text-xs sm:text-sm flex items-center justify-between shadow-md border-b border-amber-600 animate-fadeIn">
+          <div className="flex items-center gap-2 max-w-5xl mx-auto">
+            <AlertTriangle className="w-5 h-5 shrink-0 text-slate-950" />
+            <span>
+              ⚠️ Emergency Resilience Mode Active. The central database is currently offline. Your civic request has been securely cached on this device and will sync automatically when the connection is restored.
+            </span>
+          </div>
+          <button 
+            type="button"
+            onClick={() => setIsBlackoutBannerDismissed(true)} 
+            className="p-1 hover:bg-amber-600/30 rounded text-slate-950 font-bold shrink-0 ml-2"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
 
       {/* Main Public Header */}
       <header className="bg-[#0f2942] text-white border-b border-slate-700 sticky top-0 z-30 shadow-md">

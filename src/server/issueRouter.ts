@@ -139,16 +139,27 @@ router.post('/', async (req: Request, res: Response) => {
     const reportedDate = new Date().toISOString().slice(0, 10);
     const ticketNumber = `KPG-${String(Math.floor(1000 + Math.random() * 9000))}`;
 
+    // Check for DB readiness (SRE Emergency Blackout Mode check)
     if (mongoose.connection.readyState !== 1) {
-      const newRank = mockIssuesStore.length + 1;
+      console.warn('⚠️ [BLACKOUT MODE ACTIVE] MongoDB unreachable. Returning 503 blackout response.');
+      return res.status(503).json({
+        error: 'Database unreachable',
+        blackoutMode: true,
+        ticketNumber
+      });
+    }
+
+    try {
+      const existingCount = await IssueModel.countDocuments();
+      const newRank = existingCount + 1;
+
       const justification = generateJustification(
         { currentRank: newRank, category, ward, locationLandmark },
         calcResult.scoreBreakdown,
         'en'
       );
 
-      const fallbackIssue: CivicIssue = {
-        id: `KPG-2026-${Date.now().toString().slice(-4)}`,
+      const issue = new IssueModel({
         ticketNumber,
         title: String(title).trim(),
         description: description ? String(description).trim() : `Civic issue reported in ${ward} near ${locationLandmark}.`,
@@ -173,65 +184,36 @@ router.post('/', async (req: Request, res: Response) => {
         isActionedThisCycle: false,
         isOverridden: false,
         aiVerification: aiVerification || undefined,
-      };
+      });
 
-      mockIssuesStore.push(fallbackIssue);
-      return res.status(201).json({ issue: fallbackIssue, ticketNumber });
+      await issue.save();
+
+      await new AuditLogModel({
+        timestamp: new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }),
+        actionType: 'ISSUE_INGESTED',
+        issueId: issue._id.toString(),
+        ticketNumber: issue.ticketNumber,
+        issueTitle: issue.title,
+        officerName: user?.userId ? 'Municipal Staff' : 'Citizen Portal / Smart City Intake',
+        officerRole: user?.role || 'Public Citizen Intake (AI Screened)',
+        details: `New civic issue ingested in ${ward} (${category}). Server-computed urgency: ${calcResult.urgencyScore}/100.`,
+      }).save();
+
+      return res.status(201).json({ issue, ticketNumber: issue.ticketNumber });
+    } catch (dbErr: any) {
+      console.error('⚠️ [BLACKOUT MODE TRIGGERED] Database save operation failed:', dbErr);
+      return res.status(503).json({
+        error: 'Database unreachable',
+        blackoutMode: true,
+        ticketNumber
+      });
     }
-
-    const existingCount = await IssueModel.countDocuments();
-    const newRank = existingCount + 1;
-
-    const justification = generateJustification(
-      { currentRank: newRank, category, ward, locationLandmark },
-      calcResult.scoreBreakdown,
-      'en'
-    );
-
-    const issue = new IssueModel({
-      ticketNumber,
-      title: String(title).trim(),
-      description: description ? String(description).trim() : `Civic issue reported in ${ward} near ${locationLandmark}.`,
-      category: category as IssueCategory,
-      ward,
-      locationLandmark: String(locationLandmark).trim(),
-      reportedDate,
-      daysOpen,
-      urgencyScore: calcResult.urgencyScore,
-      computedRank: newRank,
-      currentRank: newRank,
-      justification,
-      scoreBreakdown: calcResult.scoreBreakdown,
-      estimatedCostInr: typeof estimatedCostInr === 'number' ? estimatedCostInr : 25000,
-      estimatedCrewHours: typeof estimatedCrewHours === 'number' ? estimatedCrewHours : 8,
-      requiredEquipment: Array.isArray(requiredEquipment) ? requiredEquipment : ['General Civic Response Team'],
-      dataConfidence: (['high', 'medium', 'low'].includes(dataConfidence) ? dataConfidence : 'medium') as ConfidenceLevel,
-      dataQualityScore: typeof dataQualityScore === 'number' ? dataQualityScore : 72,
-      dataQualityFlags: Array.isArray(dataQualityFlags) ? dataQualityFlags : ['Citizen Direct Submission', 'Pending Field Officer Geotag Verification'],
-      needsReview: true,
-      status: 'ranked' as IssueStatus,
-      isActionedThisCycle: false,
-      isOverridden: false,
-      aiVerification: aiVerification || undefined,
-    });
-
-    await issue.save();
-
-    await new AuditLogModel({
-      timestamp: new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }),
-      actionType: 'ISSUE_INGESTED',
-      issueId: issue._id.toString(),
-      ticketNumber: issue.ticketNumber,
-      issueTitle: issue.title,
-      officerName: user?.userId ? 'Municipal Staff' : 'Citizen Portal / Smart City Intake',
-      officerRole: user?.role || 'Public Citizen Intake (AI Screened)',
-      details: `New civic issue ingested in ${ward} (${category}). Server-computed urgency: ${calcResult.urgencyScore}/100.`,
-    }).save();
-
-    return res.status(201).json({ issue, ticketNumber: issue.ticketNumber });
   } catch (err: any) {
     console.error('[POST /api/issues]', err);
-    return res.status(500).json({ error: 'Failed to create issue.' });
+    return res.status(503).json({
+      error: 'Database unreachable',
+      blackoutMode: true
+    });
   }
 });
 

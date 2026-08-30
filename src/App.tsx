@@ -55,6 +55,7 @@ function DashboardApp({ onSwitchToCitizenView }: DashboardAppProps) {
   const [issues, setIssues] = useState<CivicIssue[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>([]);
   const [issuesLoading, setIssuesLoading] = useState(true);
+  const [isBlackoutError, setIsBlackoutError] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const triggerRefresh = useCallback(() => setRefreshTrigger(n => n + 1), []);
@@ -62,12 +63,27 @@ function DashboardApp({ onSwitchToCitizenView }: DashboardAppProps) {
   // Fetch issues from API (ward-scoped by role server-side)
   useEffect(() => {
     setIssuesLoading(true);
+    setIsBlackoutError(false);
     fetch('/api/issues', { credentials: 'include' })
-      .then(r => r.json())
+      .then(async (r) => {
+        if (r.status === 503) {
+          setIsBlackoutError(true);
+          return { issues: [] };
+        }
+        const data = await r.json();
+        if (data.blackoutMode) {
+          setIsBlackoutError(true);
+          return { issues: [] };
+        }
+        return data;
+      })
       .then(data => {
         if (data.issues) setIssues(data.issues);
       })
-      .catch(err => console.error('[App] Failed to fetch issues:', err))
+      .catch(err => {
+        console.error('[App] Failed to fetch issues (Blackout mode):', err);
+        setIsBlackoutError(true);
+      })
       .finally(() => setIssuesLoading(false));
   }, [refreshTrigger]);
 
@@ -383,6 +399,23 @@ function DashboardApp({ onSwitchToCitizenView }: DashboardAppProps) {
         {/* TAB 1: RANKED PRIORITY QUEUE */}
         {activeTab === 'queue' && (
           <div>
+            {isBlackoutError && (
+              <div className="bg-slate-900 text-slate-100 rounded-3xl p-8 border border-slate-800 shadow-2xl mb-6 text-center space-y-3 animate-fadeIn">
+                <div className="w-14 h-14 bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-2xl flex items-center justify-center mx-auto">
+                  <AlertTriangle className="w-7 h-7 shrink-0 text-amber-400" />
+                </div>
+                <div className="inline-block px-3 py-1 rounded-full text-xs font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase tracking-wider">
+                  ⚠️ EMERGENCY RESILIENCE MODE ACTIVE
+                </div>
+                <h3 className="text-xl sm:text-2xl font-black tracking-tight text-white font-mono max-w-2xl mx-auto">
+                  SYSTEM BLACKOUT: Historical data unreachable. Knapsack algorithm paused. Standing by for database restoration.
+                </h3>
+                <p className="text-sm text-slate-400 font-medium max-w-lg mx-auto">
+                  The municipal database connection is offline. Automated triage and two-stage knapsack calculations are paused to prevent invalid allocation commits.
+                </p>
+              </div>
+            )}
+
             <FilterBar
               filters={filters}
               setFilters={setFilters}
