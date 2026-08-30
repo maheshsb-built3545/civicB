@@ -26,6 +26,8 @@ export interface IUser extends Document {
   ward: string;
   department: string;
   badgeNumber: string;
+  maxActiveTicketCapacity?: number;
+  specializations?: string[];
   comparePassword(candidate: string): Promise<boolean>;
 }
 
@@ -49,6 +51,8 @@ const UserSchema = new Schema<IUser>(
     ward: { type: String, required: true, default: 'All Wards' },
     department: { type: String, required: true },
     badgeNumber: { type: String, required: true, unique: true },
+    maxActiveTicketCapacity: { type: Number, default: 3 },
+    specializations: [{ type: String }],
   },
   {
     timestamps: true,
