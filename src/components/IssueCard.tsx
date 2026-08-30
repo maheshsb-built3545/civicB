@@ -52,81 +52,77 @@ export const IssueCard: React.FC<IssueCardProps> = ({
     return rank < 10 ? `0${rank}` : `${rank}`;
   };
 
-  // Gazette Rotated Ink Stamp Helper
-  const renderStampBadge = () => {
+  // Modern Urgency Badge Helper
+  const renderUrgencyBadge = () => {
     if (issue.isOverridden) {
       return (
-        <span className="gazette-stamp gazette-stamp-override" title="Administrative Override Applied">
-          ⚡ {language === 'mr' ? 'अधिकारी बदल' : 'OVERRIDDEN'}
-        </span>
-      );
-    }
-    if (issue.urgencyScore >= 90) {
-      return (
-        <span className="gazette-stamp gazette-stamp-critical">
-          CRITICAL // {issue.urgencyScore.toFixed(0)}
+        <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-extrabold bg-purple-100 text-purple-700 border border-purple-200 shadow-2xs">
+          ⚡ {language === 'mr' ? 'प्रशासकीय प्राधान्य बदल' : 'ADMIN OVERRIDE'}
         </span>
       );
     }
     if (issue.urgencyScore >= 75) {
       return (
-        <span className="gazette-stamp gazette-stamp-high">
-          HIGH // {issue.urgencyScore.toFixed(0)}
+        <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-extrabold bg-red-100 text-red-700 border border-red-200 shadow-2xs">
+          <Sparkles className="w-4 h-4 text-red-600 shrink-0" />
+          <span>{issue.urgencyScore.toFixed(0)}/100 {language === 'mr' ? 'अति-महत्त्वाचे' : 'HIGH URGENCY'}</span>
         </span>
       );
     }
     if (issue.urgencyScore >= 50) {
       return (
-        <span className="gazette-stamp gazette-stamp-medium">
-          MEDIUM // {issue.urgencyScore.toFixed(0)}
+        <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-extrabold bg-amber-100 text-amber-800 border border-amber-200">
+          <Clock className="w-4 h-4 text-amber-600 shrink-0" />
+          <span>{issue.urgencyScore.toFixed(0)}/100 {language === 'mr' ? 'मध्यम' : 'MEDIUM'}</span>
         </span>
       );
     }
     return (
-      <span className="gazette-stamp gazette-stamp-low">
-        ROUTINE // {issue.urgencyScore.toFixed(0)}
+      <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-extrabold bg-blue-100 text-blue-700 border border-blue-200">
+        <span>{issue.urgencyScore.toFixed(0)}/100 {language === 'mr' ? 'सामान्य' : 'ROUTINE'}</span>
       </span>
     );
   };
 
   return (
     <div 
-      className={`group relative rounded-sm border transition-all duration-150 overflow-hidden bg-[#fffdfa] ${
+      className={`group relative rounded-2xl border transition-all duration-200 bg-white p-5 sm:p-6 shadow-sm hover:shadow-md ${
         issue.isActionedThisCycle
-          ? 'border-emerald-700 shadow-xs ring-1 ring-emerald-600/30'
+          ? 'border-emerald-500/80 ring-2 ring-emerald-500/20'
           : isDeferred
-          ? 'border-[#c4b6a3] bg-[#f7f3ec]/60 opacity-85'
+          ? 'border-slate-200 bg-slate-50/50 opacity-80'
           : issue.isOverridden
-          ? 'border-purple-300 shadow-2xs'
+          ? 'border-purple-200 ring-1 ring-purple-500/10'
           : issue.needsReview
-          ? 'border-amber-300 shadow-2xs'
-          : 'border-[#e3dacd] hover:border-[#b8aba0] shadow-2xs'
+          ? 'border-amber-200 ring-1 ring-amber-500/10'
+          : 'border-slate-200/80 hover:border-slate-300'
       }`}
     >
-      {/* Top Gazette Status Banner if special state */}
+      {/* Top Banner for Special Statuses */}
       {(issue.isOverridden || (!issue.isActionedThisCycle && isDeferred) || issue.needsReview) && (
-        <div className={`px-4 py-1.5 flex items-center justify-between text-xs font-mono border-b ${
+        <div className={`-mx-5 sm:-mx-6 -mt-5 sm:-mt-6 mb-4 px-5 py-2.5 flex items-center justify-between text-xs font-medium border-b rounded-t-2xl ${
           issue.isOverridden
-            ? 'bg-purple-50 text-purple-950 border-purple-200'
+            ? 'bg-purple-50 text-purple-900 border-purple-100'
             : !issue.isActionedThisCycle && isDeferred
-            ? 'bg-[#f2ece1] text-[#59534c] border-[#e3dacd]'
-            : 'bg-amber-50 text-amber-950 border-amber-200'
+            ? 'bg-slate-100/90 text-slate-700 border-slate-200'
+            : 'bg-amber-50 text-amber-900 border-amber-100'
         }`}>
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2">
             {issue.isOverridden ? (
-              <span>
-                <strong>{language === 'mr' ? 'प्रशासकीय प्राधान्य बदल: ' : 'Administrative Override: '}</strong>
-                {issue.overrideDetails?.officerName} (Orig #{issue.overrideDetails?.originalRank} → #{issue.overrideDetails?.newRank})
+              <span className="flex items-center gap-1.5">
+                <strong className="font-bold">{language === 'mr' ? 'प्रशासकीय नोंद:' : 'Officer Directive:'}</strong>
+                <span>{issue.overrideDetails?.officerName} (Rank #{issue.overrideDetails?.originalRank} → #{issue.overrideDetails?.newRank})</span>
               </span>
             ) : !issue.isActionedThisCycle && isDeferred ? (
-              <span>
-                ⏳ <strong>{language === 'mr' ? 'पुढील चक्रासाठी पुढे ढकलले: ' : 'Deferred to Next Sprint: '}</strong> 
+              <span className="flex items-center gap-1.5">
+                <Clock className="w-4 h-4 text-slate-500 shrink-0" />
+                <strong className="font-bold">{language === 'mr' ? 'पुढील चक्रासाठी पुढे ढकलले:' : 'Deferred to Next Cycle:'}</strong>
                 <span>{deferredReason}</span>
               </span>
             ) : (
-              <span className="flex items-center gap-1 font-bold">
-                <AlertTriangle className="w-3.5 h-3.5 text-amber-700 shrink-0" />
-                {language === 'mr' ? 'कमी विश्वसनीयता — प्रत्यक्ष पडताळणी आवश्यक' : 'Low Confidence — Field Geotag Verification Required'}
+              <span className="flex items-center gap-1.5 font-semibold text-amber-800">
+                <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                <span>{language === 'mr' ? 'कमी विश्वसनीयता — प्रत्यक्ष पडताळणी आवश्यक' : 'Field Geotag Verification Required'}</span>
               </span>
             )}
           </div>
@@ -134,7 +130,7 @@ export const IssueCard: React.FC<IssueCardProps> = ({
           {issue.needsReview && onOpenDataReview && (
             <button
               onClick={() => onOpenDataReview(issue)}
-              className="font-bold text-amber-950 hover:underline uppercase text-[10px] tracking-wider cursor-pointer font-mono"
+              className="font-bold text-amber-800 hover:text-amber-950 underline uppercase text-xs cursor-pointer"
             >
               {language === 'mr' ? 'पडताळा' : 'Inspect'}
             </button>
@@ -142,188 +138,161 @@ export const IssueCard: React.FC<IssueCardProps> = ({
         </div>
       )}
 
-      {/* Main Content Body */}
-      <div className="p-4 sm:p-4.5">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
+      {/* Main Content Layout */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+        
+        {/* Left Section: Rank, Metadata, Title, Rationale */}
+        <div className="flex items-start gap-4 flex-1 min-w-0">
           
-          {/* Left: Rank & Issue Details */}
-          <div className="flex items-start gap-3.5 flex-1 min-w-0">
-            
-            {/* Crisp Gazette Rank Stamp Badge */}
-            <div className="shrink-0 text-center pt-0.5">
-              <div className={`px-2.5 py-1 rounded-sm border font-mono font-black text-2xl sm:text-3xl leading-none select-none ${
-                issue.isActionedThisCycle
-                  ? 'bg-emerald-50 text-emerald-900 border-emerald-300'
-                  : isDeferred
-                  ? 'bg-slate-100 text-slate-500 border-slate-300'
-                  : issue.isOverridden 
-                  ? 'bg-purple-50 text-purple-900 border-purple-300' 
-                  : issue.currentRank === 1 
-                  ? 'bg-rose-50 text-rose-900 border-rose-300' 
-                  : 'bg-[#f4efe6] text-[#24211e] border-[#c4b6a3]'
-              }`}>
-                #{getRankNumberFormatted(issue.currentRank)}
-              </div>
-              <span className="text-[9px] font-mono font-bold uppercase tracking-wider text-[#8c8275] block mt-1">
-                {t.rankLabel}
+          {/* Bold Rank Circle Badge */}
+          <div className="shrink-0 pt-0.5">
+            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-extrabold font-mono text-xl tracking-tight shadow-xs ${
+              issue.isActionedThisCycle
+                ? 'bg-emerald-600 text-white shadow-emerald-200'
+                : isDeferred
+                ? 'bg-slate-200 text-slate-500'
+                : issue.isOverridden 
+                ? 'bg-purple-600 text-white shadow-purple-200' 
+                : issue.currentRank === 1 
+                ? 'bg-rose-600 text-white shadow-rose-200' 
+                : 'bg-slate-900 text-white'
+            }`}>
+              #{getRankNumberFormatted(issue.currentRank)}
+            </div>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block text-center mt-1">
+              {t.rankLabel}
+            </span>
+          </div>
+
+          {/* Issue Details Body */}
+          <div className="flex-1 min-w-0 space-y-1.5">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="font-mono text-xs font-bold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200/80">
+                {issue.ticketNumber}
               </span>
+
+              <span className="text-xs font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200/80">
+                {getCategoryName(issue.category)}
+              </span>
+
+              {renderUrgencyBadge()}
+
+              {issue.isActionedThisCycle && (
+                <span className="text-xs font-extrabold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg uppercase">
+                  {language === 'mr' ? 'मंजूर' : 'In Sprint'}
+                </span>
+              )}
+
+              {issue.aiVerification && (
+                <span 
+                  title={`AI Reasoning: ${issue.aiVerification.aiReasoning}`}
+                  className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-lg bg-sky-50 text-sky-800 border border-sky-200 cursor-help"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-sky-600 shrink-0" />
+                  <span>AI: {issue.aiVerification.isLikelyGenuine ? 'Genuine' : 'Flagged'} ({issue.aiVerification.confidenceLabel})</span>
+                </span>
+              )}
             </div>
 
-            {/* Title, Category & Location */}
-            <div className="flex-1 min-w-0">
-              <div className="flex flex-wrap items-center gap-2 mb-1">
-                {/* Monospace Ticket Number */}
-                <span className="font-mono text-xs font-bold text-[#59534c] bg-[#f4efe6] border border-[#d3c7b8] px-1.5 py-0.5 rounded-sm">
-                  {issue.ticketNumber}
-                </span>
+            {/* Title */}
+            <h3 className="text-base sm:text-lg font-bold text-slate-900 leading-snug group-hover:text-blue-600 transition-colors">
+              {issueText.title}
+            </h3>
 
-                {/* Category Badge */}
-                <span className="text-[10px] font-mono font-bold uppercase px-2 py-0.5 rounded-sm bg-[#f5efe4] text-[#24211e] border border-[#c4b6a3]">
-                  {getCategoryName(issue.category)}
-                </span>
+            {/* Rationale */}
+            <p className={`text-sm leading-relaxed ${issue.isOverridden ? 'font-semibold text-purple-950' : 'text-slate-600'}`}>
+              {issue.isOverridden 
+                ? `Manually prioritized by Staff. Reason: ${issue.overrideDetails?.reason || issueText.justification}`
+                : issueText.justification}
+            </p>
 
-                {/* Rotated Ink Stamp Badge */}
-                {renderStampBadge()}
-
-                {issue.isActionedThisCycle && (
-                  <span className="text-[10px] font-mono font-bold text-emerald-900 bg-emerald-100 border border-emerald-300 px-1.5 py-0.5 rounded-sm uppercase">
-                    {language === 'mr' ? 'मंजूर' : 'In Sprint'}
-                  </span>
-                )}
-
-                {issue.aiVerification && (
-                  <span 
-                    title={`AI Screening: ${issue.aiVerification.aiReasoning}`}
-                    className="inline-flex items-center gap-1 text-[10px] font-mono font-semibold px-2 py-0.5 rounded-sm bg-sky-50 text-sky-900 border border-sky-300 cursor-help"
-                  >
-                    <Sparkles className="w-3 h-3 text-sky-700 shrink-0" />
-                    <span>
-                      AI: {issue.aiVerification.isLikelyGenuine ? 'Genuine' : 'Flagged'} ({issue.aiVerification.confidenceLabel})
-                    </span>
-                  </span>
-                )}
+            {/* Location & Interactive Triggers */}
+            <div className="pt-1 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-500 font-medium">
+              <div className="flex items-center gap-1.5 text-slate-700">
+                <MapPin className="w-4 h-4 text-slate-400 shrink-0" />
+                <span className="font-bold">{getWardName(issue.ward)}</span>
+                <span className="text-slate-400">• {issueText.landmark}</span>
               </div>
 
-              {/* Gazette Serif Title */}
-              <h3 className="text-base sm:text-lg font-serif font-bold text-[#24211e] leading-snug group-hover:text-[#6b2d18] transition-colors line-clamp-1">
-                {issueText.title}
-              </h3>
+              <div className="flex items-center gap-1.5 font-mono text-slate-500">
+                <Clock className="w-4 h-4 text-slate-400 shrink-0" />
+                <span>{issue.daysOpen}{language === 'mr' ? 'दिस' : 'd open'}</span>
+              </div>
 
-              <p className={`text-xs mt-0.5 line-clamp-1 ${issue.isOverridden ? 'font-bold text-purple-950' : 'text-[#59534c]'}`}>
-                {issue.isOverridden 
-                  ? `Manually prioritized by Staff. Reason: ${issue.overrideDetails?.reason || issueText.justification}`
-                  : issueText.justification}
-              </p>
+              <button
+                type="button"
+                onClick={() => onOpenJustification(issue)}
+                className="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1 cursor-pointer transition-colors"
+              >
+                <BrainCircuit className="w-4 h-4 shrink-0" />
+                <span>{language === 'mr' ? 'स्कोर सूत्र' : 'Formula Breakdown'}</span>
+              </button>
 
-              {/* Location & Metadata Row */}
-              <div className="mt-2.5 flex flex-wrap items-center gap-x-3.5 gap-y-1 text-xs text-[#59534c]">
-                <div className="flex items-center gap-1 font-medium">
-                  <MapPin className="w-3.5 h-3.5 text-[#8c8275] shrink-0" />
-                  <span className="text-[#24211e] font-bold">{getWardName(issue.ward)}</span>
-                  <span className="text-[#78716c]">• {issueText.landmark}</span>
-                </div>
-
-                <div className="flex items-center gap-1 font-mono text-[11px] text-[#59534c]">
-                  <Clock className="w-3.5 h-3.5 text-[#8c8275]" />
-                  <span>{issue.daysOpen}{language === 'mr' ? 'दिस' : 'd'}</span>
-                </div>
-
+              {onToggleSelectForCompare && (
                 <button
-                  onClick={() => onOpenJustification(issue)}
-                  className="text-[11px] font-mono font-bold text-[#6b2d18] hover:text-[#24211e] flex items-center gap-1 uppercase cursor-pointer"
+                  type="button"
+                  onClick={() => onToggleSelectForCompare(issue)}
+                  disabled={isCompareDisabled && !isSelectedForCompare}
+                  title={isSelectedForCompare ? "Deselect from comparison" : "Select for side-by-side comparison"}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                    isSelectedForCompare
+                      ? 'bg-amber-500 text-slate-950 ring-2 ring-amber-400/50 shadow-xs'
+                      : isCompareDisabled
+                      ? 'bg-slate-100 text-slate-300 cursor-not-allowed opacity-50'
+                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  }`}
                 >
-                  <BrainCircuit className="w-3.5 h-3.5" />
-                  <span>{language === 'mr' ? 'स्कोर सूत्र' : 'Score'}</span>
+                  <Scale className="w-4 h-4 shrink-0" />
+                  <span>{isSelectedForCompare ? (language === 'mr' ? 'निवडले ✓' : 'Selected ✓') : (language === 'mr' ? 'तुलना' : 'Compare')}</span>
                 </button>
+              )}
+            </div>
+          </div>
+        </div>
 
-                {onToggleSelectForCompare && (
-                  <button
-                    type="button"
-                    onClick={() => onToggleSelectForCompare(issue)}
-                    disabled={isCompareDisabled && !isSelectedForCompare}
-                    title={isSelectedForCompare ? "Deselect from comparison" : "Select for side-by-side comparison"}
-                    className={`px-2 py-0.5 rounded-sm text-[11px] font-mono font-bold transition-all flex items-center gap-1 cursor-pointer ${
-                      isSelectedForCompare
-                        ? 'bg-amber-400 text-slate-950 border border-amber-600 font-extrabold shadow-2xs'
-                        : isCompareDisabled
-                        ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed opacity-50'
-                        : 'bg-[#f4efe6] text-[#24211e] border border-[#c4b6a3] hover:bg-[#e7e0d6]'
-                    }`}
-                  >
-                    <Scale className="w-3 h-3 shrink-0" />
-                    <span>{isSelectedForCompare ? (language === 'mr' ? 'निवडले ✓' : 'Selected ✓') : (language === 'mr' ? 'तुलना' : 'Compare')}</span>
-                  </button>
-                )}
-              </div>
+        {/* Right Section: Cost & Action Buttons */}
+        <div className="flex items-center gap-4 shrink-0 pt-3 lg:pt-0 border-t lg:border-t-0 border-slate-100 justify-between lg:justify-end">
+          
+          {/* Estimated Cost & Labor Chip */}
+          <div className="text-right bg-slate-50 border border-slate-200/80 px-3.5 py-2 rounded-xl">
+            <div className="text-sm font-mono font-extrabold text-slate-900">
+              {formatInr(issue.estimatedCostInr)}
+            </div>
+            <div className="text-xs font-mono text-slate-500 font-medium">
+              {issue.estimatedCrewHours} {language === 'mr' ? 'तास' : 'hrs crew'}
             </div>
           </div>
 
-          {/* Right: Metrics & Action Controls */}
-          <div className="flex items-center gap-3 sm:gap-4 shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-[#e3dacd] justify-between md:justify-end">
-            
-            {/* Cost & Hours Chip */}
-            <div className="text-right min-w-[85px] bg-[#f7f3ec] border border-[#e3dacd] px-2.5 py-1.5 rounded-sm">
-              <div className="text-xs font-mono font-bold text-[#24211e]">
-                {formatInr(issue.estimatedCostInr)}
-              </div>
-              <div className="text-[11px] font-mono text-[#59534c] font-medium">
-                {issue.estimatedCrewHours} {language === 'mr' ? 'तास' : 'hrs'}
-              </div>
-            </div>
+          {/* Action Buttons */}
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => onToggleAction(issue.id)}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all cursor-pointer shadow-xs ${
+                issue.isActionedThisCycle
+                  ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                  : 'bg-slate-900 hover:bg-blue-600 text-white'
+              }`}
+            >
+              {issue.isActionedThisCycle && <Check className="w-4 h-4 text-emerald-200 shrink-0" />}
+              <span>{issue.isActionedThisCycle ? (language === 'mr' ? 'मंजूर' : 'Scheduled') : (language === 'mr' ? 'मंजूर करा' : 'Schedule')}</span>
+            </button>
 
-            {/* Urgency Meter */}
-            <div className="w-20 sm:w-24">
-              <div className="flex justify-between items-center text-[10px] font-mono font-extrabold mb-1">
-                <span className="text-[#8c8275] uppercase">{language === 'mr' ? 'तातडी' : 'Score'}</span>
-                <span className={
-                  issue.urgencyScore >= 90 ? 'text-rose-800' :
-                  issue.urgencyScore >= 75 ? 'text-amber-800' : 'text-[#24211e]'
-                }>
-                  {issue.urgencyScore.toFixed(0)}/100
-                </span>
-              </div>
-              <div className="h-2 w-full bg-[#e3dacd] rounded-sm overflow-hidden p-0.5">
-                <div 
-                  className={`h-full rounded-xs transition-all duration-300 ${
-                    issue.isOverridden ? 'bg-purple-700' :
-                    issue.urgencyScore >= 90 ? 'bg-rose-700' :
-                    issue.urgencyScore >= 75 ? 'bg-amber-700' : 'bg-[#24211e]'
-                  }`}
-                  style={{ width: `${issue.urgencyScore}%` }}
-                />
-              </div>
-            </div>
-
-            {/* Gazette Ink Action Buttons */}
-            <div className="flex items-center gap-1.5">
-              <button
-                type="button"
-                onClick={() => onToggleAction(issue.id)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-sm text-xs font-mono font-bold transition-all cursor-pointer ${
-                  issue.isActionedThisCycle
-                    ? 'bg-emerald-800 text-white shadow-xs hover:bg-emerald-900 border border-emerald-950'
-                    : 'bg-[#24211e] hover:bg-[#3a352e] text-[#fffdfa] border border-black'
-                }`}
-              >
-                {issue.isActionedThisCycle && <Check className="w-3.5 h-3.5 text-emerald-300" />}
-                <span>{issue.isActionedThisCycle ? (language === 'mr' ? 'मंजूर' : 'Scheduled') : (language === 'mr' ? 'मंजूर करा' : 'Schedule')}</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => onOpenOverride(issue)}
-                title={t.btnOverride}
-                className="p-1.5 bg-[#f4efe6] hover:bg-[#e7e0d6] text-[#24211e] border border-[#c4b6a3] rounded-sm transition-colors cursor-pointer"
-              >
-                <SlidersHorizontal className="w-3.5 h-3.5" />
-              </button>
-            </div>
-
+            <button
+              type="button"
+              onClick={() => onOpenOverride(issue)}
+              title={t.btnOverride}
+              className="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 rounded-xl transition-colors cursor-pointer"
+            >
+              <SlidersHorizontal className="w-5 h-5 shrink-0" />
+            </button>
           </div>
 
         </div>
+
       </div>
     </div>
   );
 };
+
 

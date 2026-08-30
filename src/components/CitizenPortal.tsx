@@ -436,39 +436,38 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
                 </div>
               </div>
             ) : (
-              /* Report Form */
-              <div className="bg-white border border-slate-200 rounded-2xl shadow-lg overflow-hidden">
-                {/* Form Banner */}
-                <div className="bg-gradient-to-r from-[#0f2942] to-[#1e3a8a] text-white p-6 sm:p-8">
-                  <div className="flex items-center gap-3">
-                    <div className="p-3 rounded-xl bg-white/10 border border-white/20 text-amber-400 shrink-0">
-                      <Send className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <h1 className="text-lg sm:text-2xl font-black tracking-tight">
-                        {language === 'mr' ? 'कोपरगाव नागरी समस्या नोंदणी' : 'Submit a Municipal Civic Issue'}
-                      </h1>
-                      <p className="text-xs sm:text-sm text-slate-200 mt-1">
-                        {language === 'mr' 
-                          ? 'रस्ते, पाणीपुरवठा, ड्रेनेज, कचरा व पथदिवे संदर्भातील तक्रारी थेट नगर परिषदेकडे नोंदवा.' 
-                          : 'Report road damage, water leaks, drainage, streetlights, or waste issues directly to Kopargaon Council.'}
-                      </p>
-                    </div>
+              /* Seamless Floating Card Report Form */
+              <div className="max-w-3xl mx-auto mt-4 sm:mt-8 bg-white rounded-3xl shadow-xl border border-slate-100 p-6 sm:p-10">
+                
+                {/* Form Header */}
+                <div className="flex items-center gap-4 mb-6 pb-6 border-b border-slate-100">
+                  <div className="p-3.5 rounded-2xl bg-blue-50 text-blue-600 border border-blue-100 shrink-0 shadow-2xs">
+                    <Send className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
+                      {language === 'mr' ? 'कोपरगाव नागरी समस्या नोंदणी' : 'Submit a Municipal Civic Issue'}
+                    </h1>
+                    <p className="text-sm text-slate-500 font-medium mt-1">
+                      {language === 'mr' 
+                        ? 'रस्ते, पाणीपुरवठा, ड्रेनेज, कचरा व पथदिवे संदर्भातील तक्रारी थेट नगर परिषदेकडे नोंदवा.' 
+                        : 'Report road damage, water leaks, drainage, streetlights, or waste issues directly to Kopargaon Council.'}
+                    </p>
                   </div>
                 </div>
 
                 {/* Spam / Scam Blocked Notification Banner */}
                 {spamError && (
-                  <div className="m-6 p-4 rounded-xl bg-rose-50 border-2 border-rose-300 text-rose-950 text-xs flex items-start gap-3 shadow-xs animate-shake">
-                    <div className="p-2 rounded-lg bg-rose-100 border border-rose-300 text-rose-700 shrink-0">
+                  <div className="mb-6 p-5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-950 text-sm flex items-start gap-3.5 shadow-2xs animate-shake">
+                    <div className="p-2.5 rounded-xl bg-rose-100 text-rose-700 shrink-0">
                       <ShieldAlert className="w-5 h-5" />
                     </div>
                     <div>
-                      <div className="font-extrabold text-sm text-rose-900 mb-1 flex items-center gap-1.5">
+                      <div className="font-extrabold text-base text-rose-900 mb-1 flex items-center gap-1.5">
                         <span>{language === 'mr' ? 'तक्रार नाकारण्यात आली (Spam / Scam Filter)' : 'Submission Blocked by Municipal AI Safety Filter'}</span>
                       </div>
                       <div className="font-semibold text-rose-900 leading-relaxed">{spamError}</div>
-                      <div className="mt-2 text-[11px] text-rose-700 bg-white/70 p-2 rounded-lg border border-rose-200">
+                      <div className="mt-2.5 text-xs text-rose-700 bg-white/80 p-3 rounded-xl border border-rose-200 font-medium">
                         {language === 'mr' 
                           ? 'नोंद: कोपरगाव नगर परिषद प्रणाली केवळ प्रत्यक्ष नागरी समस्यांसाठी (रस्ते, पाणीपुरवठा, सांडपाणी, वीज, कचरा) तक्रार क्रमांक जारी करते.'
                           : 'Note: Kopargaon Municipal Council system only issues tickets for verified civic issues (roads, water supply, sewage, electricity, garbage).'}
@@ -478,42 +477,42 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
                 )}
 
                 {/* Form Fields */}
-                <form onSubmit={handleSubmit} className="p-6 sm:p-8 space-y-5">
-                  {/* Category Selection */}
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  {/* Category Selection Clickable Grid Tiles */}
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
+                    <label className="block text-sm font-semibold text-slate-800 mb-3">
                       {language === 'mr' ? '१. समस्येचा विभाग निवडा (Select Category):' : '1. Problem Category:'} <span className="text-rose-500">*</span>
                     </label>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                       {CATEGORIES_LIST.filter(c => c !== 'All Categories').map((cat) => (
                         <button
                           key={cat}
                           type="button"
                           onClick={() => setCategory(cat as IssueCategory)}
-                          className={`p-3 rounded-xl border text-left text-xs font-bold transition-all flex items-start gap-2 ${
+                          className={`p-4 rounded-2xl border text-left text-sm transition-all flex items-center gap-3 cursor-pointer ${
                             category === cat
-                              ? 'border-[#0f2942] bg-blue-50/60 text-[#0f2942] ring-2 ring-[#0f2942]/20 shadow-xs'
-                              : 'border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50'
+                              ? 'ring-2 ring-blue-600 bg-blue-50 text-blue-700 font-semibold border-transparent shadow-xs'
+                              : 'border-slate-200 text-slate-600 hover:border-blue-400 hover:bg-blue-50'
                           }`}
                         >
-                          <Tag className={`w-4 h-4 shrink-0 mt-0.5 ${category === cat ? 'text-[#0f2942]' : 'text-slate-400'}`} />
-                          <span className="line-clamp-2">{getCategoryName(cat)}</span>
+                          <Tag className={`w-5 h-5 shrink-0 ${category === cat ? 'text-blue-600' : 'text-slate-400'}`} />
+                          <span className="line-clamp-2 leading-snug">{getCategoryName(cat)}</span>
                         </button>
                       ))}
                     </div>
                   </div>
 
                   {/* Ward & Landmark Grid */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
                     {/* Ward */}
                     <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                      <label className="block text-sm font-semibold text-slate-800 mb-2">
                         {language === 'mr' ? '२. प्रभाग / वॉर्ड निवडा:' : '2. Ward Area:'} <span className="text-rose-500">*</span>
                       </label>
                       <select
                         value={ward}
                         onChange={(e) => setWard(e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-800 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-[#0f2942]"
+                        className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-medium text-slate-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-white"
                       >
                         {WARDS_LIST.filter(w => w !== 'All Wards').map((w) => (
                           <option key={w} value={w}>
@@ -525,12 +524,12 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
 
                     {/* Landmark */}
                     <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                        {language === 'mr' ? '३. जवळची खूण / पत्ता (Landmark):' : '3. Landmark / Specific Location:'} <span className="text-rose-500">*</span>
+                      <label className="block text-sm font-semibold text-slate-800 mb-2">
+                        {language === 'mr' ? '३. जवळची खूण / पत्ता (Landmark):' : '3. Landmark / Location:'} <span className="text-rose-500">*</span>
                       </label>
                       <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                          <MapPin className="w-4 h-4" />
+                        <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                          <MapPin className="w-5 h-5" />
                         </div>
                         <input
                           type="text"
