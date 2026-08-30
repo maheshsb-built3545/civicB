@@ -243,6 +243,8 @@ router.post('/', async (req: Request, res: Response) => {
       blackoutMode: true
     });
   }
+});
+
 // ─── GET /api/issues/public/all — PUBLIC BOARD (NO Auth Required) ─────────
 router.get('/public/all', async (_req: Request, res: Response) => {
   try {
