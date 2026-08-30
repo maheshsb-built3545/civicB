@@ -11,6 +11,8 @@ export interface IssueVerificationInput {
 export interface IssueVerificationResult {
   isLikelyGenuine: boolean;
   isSpam: boolean;
+  isMisinformationRisk?: boolean;
+  safetyRationale?: string | null;
   confidenceLabel: 'high' | 'medium' | 'low';
   aiReasoning: string;
   rejectionReason?: string | null;
@@ -60,19 +62,21 @@ export async function verifyIssueSubmission(
 
     clearTimeout(timeoutId);
 
-    if (res.ok) {
-      const data = await res.json();
-      return {
-        isLikelyGenuine: Boolean(data.isLikelyGenuine),
-        isSpam: Boolean(data.isSpam),
-        confidenceLabel: ['high', 'medium', 'low'].includes(data.confidenceLabel)
-          ? data.confidenceLabel
-          : 'medium',
-        aiReasoning: data.aiReasoning || (data.isSpam ? 'Flagged as non-civic content or spam.' : 'Civic complaint verified.'),
-        rejectionReason: data.rejectionReason || (data.isSpam ? data.aiReasoning : null),
-        suggestedCategory: data.suggestedCategory || undefined
-      };
-    }
+      if (res.ok) {
+        const data = await res.json();
+        return {
+          isLikelyGenuine: Boolean(data.isLikelyGenuine),
+          isSpam: Boolean(data.isSpam),
+          isMisinformationRisk: Boolean(data.isMisinformationRisk),
+          safetyRationale: data.safetyRationale || null,
+          confidenceLabel: ['high', 'medium', 'low'].includes(data.confidenceLabel)
+            ? data.confidenceLabel
+            : 'medium',
+          aiReasoning: data.aiReasoning || (data.isSpam ? 'Flagged as non-civic content or spam.' : 'Civic complaint verified.'),
+          rejectionReason: data.rejectionReason || (data.isSpam ? data.aiReasoning : null),
+          suggestedCategory: data.suggestedCategory || undefined
+        };
+      }
   } catch (err) {
     console.warn('[AI Issue Verification] Backend API call error or timeout, relying on heuristic verification:', err);
   }

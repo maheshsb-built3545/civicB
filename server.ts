@@ -117,8 +117,8 @@ async function startServer() {
         });
       }
 
-      const prompt = `You are a municipal complaint triage and spam classifier for the Kopargaon Municipal Council (कोपरगाव नगर परिषद), Ahmednagar district, Maharashtra, India.
-Your job is to determine if a citizen submission is a GENUINE civic issue or SPAM / SCAM / FAKE / JUNK.
+      const prompt = `You are a municipal complaint triage, spam classifier, and Misinformation Shield for the Kopargaon Municipal Council (कोपरगाव नगर परिषद), Ahmednagar district, Maharashtra, India.
+Your job is to determine if a citizen submission is a GENUINE civic issue, SPAM/SCAM, or a MISINFORMATION / BAD-FAITH / DEFAMATORY ATTACK.
 
 Submission to evaluate:
 - Title: "${title}"
@@ -127,30 +127,32 @@ Submission to evaluate:
 - Ward: "${ward}"
 - Landmark: "${landmark}"
 
+MISINFORMATION & BAD-FAITH DETECTION RULES (isMisinformationRisk: true):
+- Detect highly emotive attacks targeting named individuals, rival business owners, officers, or politicians.
+- Detect fake coordinated panic, impossible fantasy scenarios (e.g., aliens/ufo damaging roads, fake chemical spills, fabricated biological threats), smearing rumors, or political character assassination.
+- If isMisinformationRisk is true, set isLikelyGenuine: false, and provide a brief safetyRationale explaining the misinformation or defamatory nature.
+
 CLASSIFICATION RULES:
 1. SPAM / SCAM (isSpam: true, isLikelyGenuine: false):
-   - Any financial scams (lottery, work-from-home, prize money, instant loans, KYC fraud, OTP requests, crypto/bitcoin, trading).
-   - Commercial advertising, promotion of shops/services, marketing, promotional links/URLs, telegram or whatsapp group invites.
-   - Irrelevant non-civic chat, jokes, gibberish, personal conversations, insults with no civic problem.
-   - Test placeholder submissions ("test 123", "hello checking", "sample").
+   - Financial scams, commercial promotions, marketing links, OTP requests, crypto, or test mashing.
 
-2. GENUINE CIVIC COMPLAINT (isSpam: false, isLikelyGenuine: true):
-   - Real municipal issues in Kopargaon: potholes, broken roads, contaminated/no water supply, leaking water pipe, clogged drain, overflowing gutter/sewage, dark streetlights, uncollected garbage, open manholes, stray dog menace, encroached public paths, etc.
-   - Genuine complaints can be in English, Marathi (मराठी), Hindi, or transliterated Marathi/Hinglish (e.g. "khadda aahe", "light lagat nahi", "kachra gadi aali nahi").
-   - Even short or poorly formatted genuine complaints should be classified as isSpam: false, isLikelyGenuine: true.
+2. GENUINE CIVIC COMPLAINT (isSpam: false, isLikelyGenuine: true, isMisinformationRisk: false):
+   - Real municipal issues in Kopargaon: potholes, broken roads, contaminated water, leaking pipe, clogged drain, dark streetlights, garbage, stray dogs, open manholes.
 
 CONFIDENCE:
-- "high": Clear spam/scam OR clearly identifiable civic issue.
-- "medium": Plausible complaint with limited words.
-- "low": Highly ambiguous.
+- "high": Clear spam/scam/misinformation OR clearly genuine civic issue.
+- "medium": Plausible complaint with limited context.
+- "low": Ambiguous.
 
 Output STRICT JSON only:
 {
   "isSpam": boolean,
   "isLikelyGenuine": boolean,
+  "isMisinformationRisk": boolean,
   "confidenceLabel": "high" | "medium" | "low",
   "aiReasoning": string,
   "rejectionReason": string | null,
+  "safetyRationale": string | null,
   "suggestedCategory": string | null
 }`;
 
@@ -173,9 +175,10 @@ Output STRICT JSON only:
       const parsed = JSON.parse(cleaned);
 
       const isSpam = Boolean(parsed.isSpam);
+      const isMisinformationRisk = Boolean(parsed.isMisinformationRisk);
       const isLikelyGenuine = typeof parsed.isLikelyGenuine === 'boolean'
         ? parsed.isLikelyGenuine
-        : !isSpam;
+        : (!isSpam && !isMisinformationRisk);
 
       const confidenceLabel: 'high' | 'medium' | 'low' =
         ['high', 'medium', 'low'].includes(parsed.confidenceLabel)
@@ -186,11 +189,26 @@ Output STRICT JSON only:
         ? (parsed.rejectionReason || parsed.aiReasoning || 'Submission does not describe a valid civic or municipal issue.')
         : null;
 
+      const safetyRationale = parsed.safetyRationale || (isMisinformationRisk ? 'Flagged as bad-faith intent, defamation, or misinformation risk.' : null);
+
       const aiReasoning = typeof parsed.aiReasoning === 'string' && parsed.aiReasoning.trim()
         ? parsed.aiReasoning.trim()
-        : isSpam
+        : isMisinformationRisk
+          ? 'Quarantined due to misinformation risk or defamatory content.'
+          : isSpam
           ? 'Submission flagged as non-civic content or spam.'
           : 'Submission identified as a valid municipal complaint.';
+
+      return res.json({
+        isLikelyGenuine,
+        isSpam,
+        isMisinformationRisk,
+        confidenceLabel,
+        aiReasoning,
+        rejectionReason,
+        safetyRationale,
+        suggestedCategory: parsed.suggestedCategory || undefined
+      });
 
       // [DIAG] TEMPORARY DIAGNOSTIC LOG — REMOVE AFTER VERIFICATION
       console.log(`[DIAG][verify-issue] DECISION_SOURCE=GEMINI_AI | title="${title.substring(0, 50)}" | isSpam=${isSpam} | confidence=${confidenceLabel} | reasoning="${aiReasoning.substring(0, 80)}"`);

@@ -149,15 +149,28 @@ router.post('/', async (req: Request, res: Response) => {
       });
     }
 
-    try {
-      const existingCount = await IssueModel.countDocuments();
-      const newRank = existingCount + 1;
+    // Misinformation Shield Check (The Bad Reading Protection)
+    const isMisinformationRisk = Boolean(
+      req.body.isMisinformationRisk ||
+      req.body.aiVerification?.isMisinformationRisk
+    );
+    const safetyRationale = req.body.safetyRationale || req.body.aiVerification?.safetyRationale || null;
 
-      const justification = generateJustification(
-        { currentRank: newRank, category, ward, locationLandmark },
+    // CRITICAL SRE/SAFETY LOGIC: If isMisinformationRisk is true, force urgencyScore to 0 and needsReview to true
+    const finalUrgencyScore = isMisinformationRisk ? 0 : calcResult.urgencyScore;
+    const finalNeedsReview = isMisinformationRisk ? true : true;
+    const justification = generateJustification(
+        { currentRank: 0, category, ward, locationLandmark },
         calcResult.scoreBreakdown,
         'en'
       );
+    const finalJustification = isMisinformationRisk
+      ? `🛑 FLAG: MISINFORMATION RISK. ${safetyRationale || 'Quarantined due to bad-faith intent, defamation, or rumors.'}`
+      : justification;
+
+    try {
+      const existingCount = await IssueModel.countDocuments();
+      const newRank = existingCount + 1;
 
       const issue = new IssueModel({
         ticketNumber,
@@ -168,35 +181,50 @@ router.post('/', async (req: Request, res: Response) => {
         locationLandmark: String(locationLandmark).trim(),
         reportedDate,
         daysOpen,
-        urgencyScore: calcResult.urgencyScore,
+        urgencyScore: finalUrgencyScore,
         computedRank: newRank,
         currentRank: newRank,
-        justification,
+        justification: finalJustification,
         scoreBreakdown: calcResult.scoreBreakdown,
         estimatedCostInr: typeof estimatedCostInr === 'number' ? estimatedCostInr : 25000,
         estimatedCrewHours: typeof estimatedCrewHours === 'number' ? estimatedCrewHours : 8,
         requiredEquipment: Array.isArray(requiredEquipment) ? requiredEquipment : ['General Civic Response Team'],
-        dataConfidence: (['high', 'medium', 'low'].includes(dataConfidence) ? dataConfidence : 'medium') as ConfidenceLevel,
-        dataQualityScore: typeof dataQualityScore === 'number' ? dataQualityScore : 72,
-        dataQualityFlags: Array.isArray(dataQualityFlags) ? dataQualityFlags : ['Citizen Direct Submission', 'Pending Field Officer Geotag Verification'],
-        needsReview: true,
-        status: 'ranked' as IssueStatus,
+        dataConfidence: isMisinformationRisk ? 'low' : (['high', 'medium', 'low'].includes(dataConfidence) ? dataConfidence : 'medium') as ConfidenceLevel,
+        dataQualityScore: isMisinformationRisk ? 0 : (typeof dataQualityScore === 'number' ? dataQualityScore : 72),
+        dataQualityFlags: isMisinformationRisk
+          ? ['🛑 MISINFORMATION RISK', 'Quarantined by AI Shield', 'Pending Legal / Administrative Officer Audit']
+          : (Array.isArray(dataQualityFlags) ? dataQualityFlags : ['Citizen Direct Submission', 'Pending Field Officer Geotag Verification']),
+        needsReview: finalNeedsReview,
+        status: isMisinformationRisk ? 'needs_review' : ('ranked' as IssueStatus),
         isActionedThisCycle: false,
         isOverridden: false,
-        aiVerification: aiVerification || undefined,
+        isMisinformationRisk,
+        safetyRationale,
+        aiVerification: aiVerification
+          ? { ...aiVerification, isMisinformationRisk, safetyRationale }
+          : {
+              isLikelyGenuine: !isMisinformationRisk,
+              confidenceLabel: 'high',
+              aiReasoning: isMisinformationRisk ? 'Flagged as misinformation risk or defamatory attack.' : 'Civic complaint verified.',
+              screenedAt: new Date().toISOString(),
+              isMisinformationRisk,
+              safetyRationale
+            },
       });
 
       await issue.save();
 
       await new AuditLogModel({
         timestamp: new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }),
-        actionType: 'ISSUE_INGESTED',
+        actionType: isMisinformationRisk ? 'DATA_VERIFIED' : 'ISSUE_INGESTED',
         issueId: issue._id.toString(),
         ticketNumber: issue.ticketNumber,
         issueTitle: issue.title,
         officerName: user?.userId ? 'Municipal Staff' : 'Citizen Portal / Smart City Intake',
         officerRole: user?.role || 'Public Citizen Intake (AI Screened)',
-        details: `New civic issue ingested in ${ward} (${category}). Server-computed urgency: ${calcResult.urgencyScore}/100.`,
+        details: isMisinformationRisk 
+          ? `🛑 [MISINFORMATION SHIELD TRIGGERED] Issue ${ticketNumber} quarantined. Urgency forced to 0/100. Rationale: ${safetyRationale}`
+          : `New civic issue ingested in ${ward} (${category}). Server-computed urgency: ${calcResult.urgencyScore}/100.`,
       }).save();
 
       return res.status(201).json({ issue, ticketNumber: issue.ticketNumber });

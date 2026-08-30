@@ -8,7 +8,8 @@ import {
   Check,
   AlertTriangle,
   Sparkles,
-  Scale
+  Scale,
+  ShieldAlert
 } from 'lucide-react';
 import { useLanguage } from '../i18n/LanguageContext';
 
@@ -40,6 +41,13 @@ export const IssueCard: React.FC<IssueCardProps> = ({
   const { language, t, getWardName, getCategoryName, getIssueText } = useLanguage();
   const issueText = getIssueText(issue);
 
+  const isMisinformation = Boolean(
+    issue.isMisinformationRisk || 
+    issue.aiVerification?.isMisinformationRisk
+  );
+
+  const safetyRationaleText = issue.safetyRationale || issue.aiVerification?.safetyRationale || 'Quarantined due to misinformation risk or defamatory attack.';
+
   const formatInr = (amount: number) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
@@ -52,8 +60,19 @@ export const IssueCard: React.FC<IssueCardProps> = ({
     return rank < 10 ? `0${rank}` : `${rank}`;
   };
 
-  // Modern Urgency Badge Helper
+  // Modern Urgency Badge Helper with Misinformation Shield Flag
   const renderUrgencyBadge = () => {
+    if (isMisinformation) {
+      return (
+        <span 
+          title={safetyRationaleText}
+          className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-rose-600 text-white border border-rose-700 shadow-md animate-pulse cursor-help"
+        >
+          <ShieldAlert className="w-4 h-4 text-white shrink-0" />
+          <span>🛑 FLAG: MISINFORMATION RISK</span>
+        </span>
+      );
+    }
     if (issue.isOverridden) {
       return (
         <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-extrabold bg-purple-100 text-purple-700 border border-purple-200 shadow-2xs">
@@ -87,7 +106,9 @@ export const IssueCard: React.FC<IssueCardProps> = ({
   return (
     <div 
       className={`group relative rounded-2xl border transition-all duration-200 bg-white p-5 sm:p-6 shadow-sm hover:shadow-md ${
-        issue.isActionedThisCycle
+        isMisinformation
+          ? 'border-rose-500 bg-rose-50/40 ring-2 ring-rose-500/30 shadow-md'
+          : issue.isActionedThisCycle
           ? 'border-emerald-500/80 ring-2 ring-emerald-500/20'
           : isDeferred
           ? 'border-slate-200 bg-slate-50/50 opacity-80'
@@ -98,8 +119,17 @@ export const IssueCard: React.FC<IssueCardProps> = ({
           : 'border-slate-200/80 hover:border-slate-300'
       }`}
     >
-      {/* Top Banner for Special Statuses */}
-      {(issue.isOverridden || (!issue.isActionedThisCycle && isDeferred) || issue.needsReview) && (
+      {/* Top Banner for Misinformation Risk or Special Statuses */}
+      {isMisinformation ? (
+        <div className="-mx-5 sm:-mx-6 -mt-5 sm:-mt-6 mb-4 px-5 py-3 flex items-center justify-between text-xs font-bold bg-rose-100 text-rose-950 border-b border-rose-300 rounded-t-2xl shadow-2xs">
+          <div className="flex items-center gap-2">
+            <ShieldAlert className="w-4 h-4 text-rose-700 shrink-0" />
+            <span>
+              <strong className="text-rose-900 font-extrabold uppercase">🛑 MISINFORMATION SHIELD QUARANTINE:</strong> {safetyRationaleText}
+            </span>
+          </div>
+        </div>
+      ) : (issue.isOverridden || (!issue.isActionedThisCycle && isDeferred) || issue.needsReview) && (
         <div className={`-mx-5 sm:-mx-6 -mt-5 sm:-mt-6 mb-4 px-5 py-2.5 flex items-center justify-between text-xs font-medium border-b rounded-t-2xl ${
           issue.isOverridden
             ? 'bg-purple-50 text-purple-900 border-purple-100'

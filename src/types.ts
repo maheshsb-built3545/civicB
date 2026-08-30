@@ -76,12 +76,18 @@ export interface CivicIssue {
     timestamp: string;
   };
 
+  // Misinformation Shield (The Bad Reading Protection)
+  isMisinformationRisk?: boolean;
+  safetyRationale?: string;
+
   // AI-Powered Spam/Validity Screening for Citizen Submissions
   aiVerification?: {
     isLikelyGenuine: boolean;
     confidenceLabel: 'high' | 'medium' | 'low';
     aiReasoning: string;
     screenedAt: string; // ISO timestamp
+    isMisinformationRisk?: boolean;
+    safetyRationale?: string;
   };
 }
 

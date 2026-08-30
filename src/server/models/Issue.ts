@@ -71,11 +71,15 @@ export interface IIssue extends Document {
     officerRole: string;
     timestamp: string;
   };
+  isMisinformationRisk?: boolean;
+  safetyRationale?: string;
   aiVerification?: {
     isLikelyGenuine: boolean;
     confidenceLabel: ConfidenceLevel;
     aiReasoning: string;
     screenedAt: string;
+    isMisinformationRisk?: boolean;
+    safetyRationale?: string;
   };
 }
 
@@ -154,11 +158,15 @@ const IssueSchema = new Schema<IIssue>(
       officerRole: { type: String },
       timestamp: { type: String },
     },
+    isMisinformationRisk: { type: Boolean, default: false },
+    safetyRationale: { type: String, default: null },
     aiVerification: {
       isLikelyGenuine: { type: Boolean },
       confidenceLabel: { type: String, enum: ['high', 'medium', 'low'] },
       aiReasoning: { type: String },
       screenedAt: { type: String },
+      isMisinformationRisk: { type: Boolean, default: false },
+      safetyRationale: { type: String, default: null },
     },
   },
   {
