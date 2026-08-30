@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { CivicIssue, IssueCategory } from '../types';
 import { WARDS_LIST, CATEGORIES_LIST } from '../data/mockData';
 import { useLanguage } from '../i18n/LanguageContext';
