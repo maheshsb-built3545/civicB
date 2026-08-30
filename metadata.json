@@ -1,0 +1,8 @@
+{
+  "name": "KopargaonPriority - Civic Decision Platform",
+  "description": "Resource-constrained civic decision support dashboard and priority queue for Kopargaon Municipal Council.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

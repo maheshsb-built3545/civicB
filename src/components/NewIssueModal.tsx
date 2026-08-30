@@ -1,0 +1,298 @@
+import React, { useState } from 'react';
+import { CivicIssue, IssueCategory } from '../types';
+import { WARDS_LIST, CATEGORIES_LIST } from '../data/mockData';
+import { PlusCircle, Sparkles, X, BrainCircuit } from 'lucide-react';
+import { useLanguage } from '../i18n/LanguageContext';
+import { calculateUrgencyScore, generateJustification } from '../utils/scoringEngine';
+
+interface NewIssueModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onAddIssue: (issue: CivicIssue) => void;
+  currentIssuesCount: number;
+}
+
+export const NewIssueModal: React.FC<NewIssueModalProps> = ({
+  isOpen,
+  onClose,
+  onAddIssue,
+  currentIssuesCount
+}) => {
+  const { language, t, getWardName, getCategoryName } = useLanguage();
+
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [category, setCategory] = useState<IssueCategory>('Roads & Potholes');
+  const [ward, setWard] = useState(WARDS_LIST[1] || 'Ward 1 - Gandhi Market & Old City');
+  const [landmark, setLandmark] = useState('');
+  const [safetyRisk, setSafetyRisk] = useState<number>(75);
+  const [citizenReports, setCitizenReports] = useState<number>(12);
+  const [daysOpen, setDaysOpen] = useState<number>(5);
+  const [facilityProximity, setFacilityProximity] = useState<number>(60);
+  const [estimatedCost, setEstimatedCost] = useState<number>(65000);
+  const [estimatedCrewHours, setEstimatedCrewHours] = useState<number>(16);
+
+  if (!isOpen) return null;
+
+  // Delegate live urgency score computation to shared pure scoring engine
+  const calcResult = calculateUrgencyScore(
+    {
+      safetyRisk,
+      citizenReportsCount: citizenReports,
+      criticalFacilityProximityScore: facilityProximity,
+      facilityDetails: `${landmark || 'locality'} corridor`
+    },
+    daysOpen
+  );
+
+  const computedUrgencyScore = calcResult.urgencyScore;
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title.trim() || !landmark.trim()) return;
+
+    try {
+      const res = await fetch('/api/issues', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          title: title.trim(),
+          description: description.trim() || `Civic issue reported in ${ward} near ${landmark}.`,
+          category,
+          ward,
+          locationLandmark: landmark.trim(),
+          safetyRisk,
+          citizenReportsCount: citizenReports,
+          criticalFacilityProximityScore: facilityProximity,
+          daysOpen,
+          estimatedCostInr: estimatedCost,
+          estimatedCrewHours,
+          requiredEquipment: ['Standard Municipal Repair Squad'],
+          dataConfidence: 'high',
+          dataQualityScore: 92,
+          dataQualityFlags: ['GPS Verified', 'Logged in Smart City Portal'],
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        alert(data.error || 'Failed to ingest issue.');
+        return;
+      }
+
+      const data = await res.json();
+      if (data.issue) {
+        onAddIssue(data.issue);
+      }
+      onClose();
+    } catch (err) {
+      console.error('[NewIssueModal]', err);
+      alert('Network error while adding issue.');
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs animate-fadeIn">
+      <div 
+        className="relative w-full max-w-xl bg-white border border-slate-200/90 rounded-2xl shadow-2xl overflow-hidden text-slate-900"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-blue-100 bg-[#0f2942] text-white">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-white/10 border border-white/20 text-amber-400">
+              <PlusCircle className="w-5 h-5" />
+            </div>
+            <div>
+              <span className="text-xs font-black uppercase tracking-wider text-amber-400">
+                {language === 'mr' ? 'नागरी समस्या नोंदणी व थेट मूल्यमापन' : 'Civic Intake Simulator'}
+              </span>
+              <h3 className="text-sm font-bold text-white mt-0.5">
+                {t.newIssueModalTitle}
+              </h3>
+            </div>
+          </div>
+          <button 
+            onClick={onClose}
+            className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Form Body */}
+        <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[75vh] overflow-y-auto custom-scrollbar">
+          {/* Title */}
+          <div>
+            <label className="block text-xs font-bold text-slate-800 mb-1">
+              {t.issueTitleLabel} <span className="text-rose-500">*</span>
+            </label>
+            <input
+              type="text"
+              required
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder={t.issueTitlePlaceholder}
+              className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-[#0f2942]"
+            />
+          </div>
+
+          {/* Ward & Category */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-bold text-slate-800 mb-1">
+                {t.wardLabel} <span className="text-rose-500">*</span>
+              </label>
+              <select
+                value={ward}
+                onChange={(e) => setWard(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs font-bold text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#0f2942]"
+              >
+                {WARDS_LIST.filter(w => w !== 'All Wards').map(w => (
+                  <option key={w} value={w}>{getWardName(w)}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-800 mb-1">
+                {t.categoryLabel} <span className="text-rose-500">*</span>
+              </label>
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value as IssueCategory)}
+                className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs font-bold text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#0f2942]"
+              >
+                {CATEGORIES_LIST.filter(c => c !== 'All Categories').map(c => (
+                  <option key={c} value={c}>{getCategoryName(c)}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Landmark */}
+          <div>
+            <label className="block text-xs font-bold text-slate-800 mb-1">
+              {t.landmarkLabel} <span className="text-rose-500">*</span>
+            </label>
+            <input
+              type="text"
+              required
+              value={landmark}
+              onChange={(e) => setLandmark(e.target.value)}
+              placeholder={t.landmarkPlaceholder}
+              className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-[#0f2942]"
+            />
+          </div>
+
+          {/* Dynamic Weight Sliders Box */}
+          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5 text-xs font-bold text-[#0f2942]">
+                <BrainCircuit className="w-4 h-4 text-[#0f2942]" />
+                <span>{t.priorityScoringFactors}</span>
+              </div>
+              <div className="px-2.5 py-1 rounded-lg bg-[#0f2942] text-amber-300 text-xs font-mono font-black shadow-xs">
+                {t.computedUrgency}: {computedUrgencyScore}/100
+              </div>
+            </div>
+
+            {/* Safety Risk */}
+            <div>
+              <div className="flex justify-between text-xs text-slate-700 font-bold mb-1">
+                <span>{t.safetyHazardSlider}:</span>
+                <span className="font-mono font-black text-rose-600">{safetyRisk}</span>
+              </div>
+              <input
+                type="range"
+                min="10"
+                max="100"
+                value={safetyRisk}
+                onChange={(e) => setSafetyRisk(Number(e.target.value))}
+                className="w-full accent-rose-600 h-1.5 bg-slate-200 rounded-lg cursor-pointer"
+              />
+            </div>
+
+            {/* Citizen Reports */}
+            <div>
+              <div className="flex justify-between text-xs text-slate-700 font-bold mb-1">
+                <span>{t.citizenReportsSlider}:</span>
+                <span className="font-mono font-black text-blue-600">{citizenReports} {language === 'mr' ? 'तक्रारी' : 'reports'}</span>
+              </div>
+              <input
+                type="range"
+                min="1"
+                max="50"
+                value={citizenReports}
+                onChange={(e) => setCitizenReports(Number(e.target.value))}
+                className="w-full accent-blue-600 h-1.5 bg-slate-200 rounded-lg cursor-pointer"
+              />
+            </div>
+
+            {/* Critical Facility Proximity */}
+            <div>
+              <div className="flex justify-between text-xs text-slate-700 font-bold mb-1">
+                <span>{t.proximitySlider}:</span>
+                <span className="font-mono font-black text-emerald-600">{facilityProximity}</span>
+              </div>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={facilityProximity}
+                onChange={(e) => setFacilityProximity(Number(e.target.value))}
+                className="w-full accent-emerald-600 h-1.5 bg-slate-200 rounded-lg cursor-pointer"
+              />
+            </div>
+          </div>
+
+          {/* Resources Input */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-bold text-slate-800 mb-1">
+                {t.estimatedCostLabel}
+              </label>
+              <input
+                type="number"
+                value={estimatedCost}
+                onChange={(e) => setEstimatedCost(Number(e.target.value))}
+                className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs font-mono font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-[#0f2942]"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-800 mb-1">
+                {t.estimatedCrewHoursLabel}
+              </label>
+              <input
+                type="number"
+                value={estimatedCrewHours}
+                onChange={(e) => setEstimatedCrewHours(Number(e.target.value))}
+                className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs font-mono font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-[#0f2942]"
+              />
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex items-center justify-end gap-3 pt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 text-xs font-bold text-slate-700 hover:text-slate-900 bg-white border border-slate-300 hover:bg-slate-50 rounded-lg"
+            >
+              {t.btnCancel}
+            </button>
+            <button
+              type="submit"
+              className="px-5 py-2 text-xs font-bold text-white bg-[#0f2942] hover:bg-[#1e3a8a] rounded-lg transition-all shadow-xs flex items-center gap-1.5"
+            >
+              <Sparkles className="w-4 h-4 text-amber-400" />
+              {t.btnComputeRankAndIngest}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
