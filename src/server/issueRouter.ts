@@ -243,6 +243,48 @@ router.post('/', async (req: Request, res: Response) => {
       blackoutMode: true
     });
   }
+// ─── GET /api/issues/public/all — PUBLIC BOARD (NO Auth Required) ─────────
+router.get('/public/all', async (_req: Request, res: Response) => {
+  try {
+    if (mongoose.connection.readyState !== 1) {
+      const publicList = mockIssuesStore.map(issue => ({
+        id: issue.id,
+        ticketNumber: issue.ticketNumber,
+        title: issue.title,
+        category: issue.category,
+        ward: issue.ward,
+        locationLandmark: issue.locationLandmark,
+        reportedDate: issue.reportedDate,
+        daysOpen: issue.daysOpen,
+        currentRank: issue.currentRank,
+        status: issue.status,
+        isActionedThisCycle: issue.isActionedThisCycle,
+        urgencyScore: issue.urgencyScore,
+      })).sort((a, b) => a.currentRank - b.currentRank);
+      return res.json({ issues: publicList });
+    }
+
+    const dbIssues = await IssueModel.find().sort({ currentRank: 1 });
+    const publicList = dbIssues.map(issue => ({
+      id: issue._id.toString(),
+      ticketNumber: issue.ticketNumber,
+      title: issue.title,
+      category: issue.category,
+      ward: issue.ward,
+      locationLandmark: issue.locationLandmark,
+      reportedDate: issue.reportedDate,
+      daysOpen: issue.daysOpen,
+      currentRank: issue.currentRank,
+      status: issue.status,
+      isActionedThisCycle: issue.isActionedThisCycle,
+      urgencyScore: issue.urgencyScore,
+    }));
+
+    return res.json({ issues: publicList });
+  } catch (err: any) {
+    console.error('[GET /api/issues/public/all]', err);
+    return res.status(500).json({ error: 'Failed to fetch public issues.' });
+  }
 });
 
 // ─── GET /api/issues (Protected by requireAuth) ───────────────────────────

@@ -192,8 +192,14 @@ function DashboardApp({ onSwitchToCitizenView }: DashboardAppProps) {
 
       const matchesCategory = 
         filters.category === 'All Categories' || issue.category === filters.category;
+      
+      const normalizeWard = (w: string) => (w || '').toLowerCase().replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim();
+      const normFilterWard = normalizeWard(filters.ward);
+      const normIssueWard = normalizeWard(issue.ward);
       const matchesWard = 
-        filters.ward === 'All Wards' || issue.ward === filters.ward;
+        filters.ward === 'All Wards' ||
+        normIssueWard === normFilterWard ||
+        (normFilterWard.split(' - ')[0] && normIssueWard.split(' - ')[0] === normFilterWard.split(' - ')[0]);
       const matchesUrgency = issue.urgencyScore >= filters.minUrgency;
       const matchesNeedsReview = !filters.showNeedsReviewOnly || issue.needsReview;
       const matchesScheduled = !filters.showScheduledOnly || issue.isActionedThisCycle;

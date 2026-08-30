@@ -128,6 +128,18 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
   const [isBlackoutActive, setIsBlackoutActive] = useState(false);
   const [isBlackoutBannerDismissed, setIsBlackoutBannerDismissed] = useState(false);
 
+  // Fetch ALL public issues directly from API to prevent ward URL encoding issues
+  const [allPublicIssues, setAllPublicIssues] = useState<CivicIssue[]>([]);
+
+  useEffect(() => {
+    fetch('/api/issues/public/all')
+      .then(r => r.json())
+      .then(data => {
+        if (data.issues) setAllPublicIssues(data.issues);
+      })
+      .catch(err => console.warn('[PublicBoard] Fallback to props issues:', err));
+  }, []);
+
   useEffect(() => {
     const queue = localStorage.getItem('urbanloop_blackout_queue');
     if (queue) {
@@ -302,10 +314,30 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
     }
   };
 
+  // Robust Ward-Matching Helper (handles & / &amp; / encoding / ward prefixes)
+  const normalizeWard = (w: string) => 
+    (w || '').toLowerCase().replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim();
+
   // Filtered issues for public transparency
-  const publicIssues = (issues || [])
-    .filter((i) => transparencyWard === 'All Wards' || i.ward === transparencyWard)
-    .sort((a, b) => a.currentRank - b.currentRank);
+  const publicIssues = useMemo(() => {
+    const sourceIssues = (allPublicIssues.length > 0 ? allPublicIssues : issues) || [];
+    return sourceIssues
+      .filter((i) => {
+        if (!transparencyWard || transparencyWard === 'All Wards') return true;
+        const normSelect = normalizeWard(transparencyWard);
+        const normIssueWard = normalizeWard(i.ward);
+        
+        if (normIssueWard === normSelect) return true;
+
+        // Compare ward prefixes e.g. "ward 3" vs "ward 3"
+        const selectPrefix = normSelect.split(' - ')[0];
+        const issuePrefix = normIssueWard.split(' - ')[0];
+        if (selectPrefix && issuePrefix && selectPrefix === issuePrefix) return true;
+
+        return false;
+      })
+      .sort((a, b) => a.currentRank - b.currentRank);
+  }, [allPublicIssues, issues, transparencyWard]);
 
   return (
     <div className="min-h-screen bg-slate-100 flex flex-col justify-between text-slate-900">
