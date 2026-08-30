@@ -1,4 +1,11 @@
 @import "tailwindcss";
+@import "./styles/tokens.css";
+
+body {
+  background-color: var(--gazette-bg, #fbf9f4);
+  color: var(--gazette-ink-main, #24211e);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
 
 @layer utilities {
   .custom-scrollbar::-webkit-scrollbar {

@@ -32,25 +32,25 @@ import {
 function getCitizenPriorityTier(score: number, language: string): { label: string; className: string } {
   if (score >= 90) {
     return {
-      label: language === 'mr' ? 'अति-महत्त्वाचे (Critical)' : 'Critical Priority',
-      className: 'bg-rose-100 text-rose-800 border-rose-200'
+      label: language === 'mr' ? 'अति-महत्त्वाचे (Critical)' : 'CRITICAL PRIORITY',
+      className: 'gazette-stamp gazette-stamp-critical'
     };
   }
   if (score >= 75) {
     return {
-      label: language === 'mr' ? 'उच्च प्राधान्य (High)' : 'High Priority',
-      className: 'bg-amber-100 text-amber-800 border-amber-200'
+      label: language === 'mr' ? 'उच्च प्राधान्य (High)' : 'HIGH PRIORITY',
+      className: 'gazette-stamp gazette-stamp-high'
     };
   }
   if (score >= 50) {
     return {
-      label: language === 'mr' ? 'मध्यम प्राधान्य (Medium)' : 'Medium Priority',
-      className: 'bg-blue-100 text-blue-800 border-blue-200'
+      label: language === 'mr' ? 'मध्यम प्राधान्य (Medium)' : 'MEDIUM PRIORITY',
+      className: 'gazette-stamp gazette-stamp-medium'
     };
   }
   return {
-    label: language === 'mr' ? 'सामान्य प्राधान्य (Standard)' : 'Standard Priority',
-    className: 'bg-slate-100 text-slate-700 border-slate-200'
+    label: language === 'mr' ? 'सामान्य प्राधान्य (Standard)' : 'ROUTINE PRIORITY',
+    className: 'gazette-stamp gazette-stamp-low'
   };
 }
 

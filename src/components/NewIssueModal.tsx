@@ -93,29 +93,29 @@ export const NewIssueModal: React.FC<NewIssueModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs animate-fadeIn">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
       <div 
-        className="relative w-full max-w-xl bg-white border border-slate-200/90 rounded-2xl shadow-2xl overflow-hidden text-slate-900"
+        className="relative w-full max-w-xl bg-[#fffdfa] border-2 border-[#3a352e] rounded-sm shadow-2xl overflow-hidden text-[#24211e]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-blue-100 bg-[#0f2942] text-white">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#3a352e] bg-[#24211e] text-[#fffdfa]">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-white/10 border border-white/20 text-amber-400">
+            <div className="p-2 rounded-sm bg-[#fffdfa]/10 border border-[#fffdfa]/20 text-amber-400">
               <PlusCircle className="w-5 h-5" />
             </div>
             <div>
-              <span className="text-xs font-black uppercase tracking-wider text-amber-400">
-                {language === 'mr' ? 'नागरी समस्या नोंदणी व थेट मूल्यमापन' : 'Civic Intake Simulator'}
+              <span className="text-[10px] font-mono font-black uppercase tracking-wider text-amber-400">
+                {language === 'mr' ? 'नागरी समस्या नोंदणी व थेट मूल्यमापन' : 'OFFICIAL GAZETTE // CIVIC INTAKE'}
               </span>
-              <h3 className="text-sm font-bold text-white mt-0.5">
+              <h3 className="text-base font-serif font-bold text-[#fffdfa] mt-0.5">
                 {t.newIssueModalTitle}
               </h3>
             </div>
           </div>
           <button 
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-colors"
+            className="p-1.5 rounded-sm text-slate-300 hover:text-white hover:bg-white/10 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -125,8 +125,8 @@ export const NewIssueModal: React.FC<NewIssueModalProps> = ({
         <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[75vh] overflow-y-auto custom-scrollbar">
           {/* Title */}
           <div>
-            <label className="block text-xs font-bold text-slate-800 mb-1">
-              {t.issueTitleLabel} <span className="text-rose-500">*</span>
+            <label className="block text-xs font-serif font-bold text-[#24211e] mb-1">
+              {t.issueTitleLabel} <span className="text-rose-700">*</span>
             </label>
             <input
               type="text"
@@ -134,20 +134,20 @@ export const NewIssueModal: React.FC<NewIssueModalProps> = ({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder={t.issueTitlePlaceholder}
-              className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-[#0f2942]"
+              className="w-full bg-[#fbf9f4] border border-[#c4b6a3] rounded-sm px-3 py-2 text-xs font-medium text-[#24211e] placeholder:text-[#8c8275] focus:outline-none focus:border-[#24211e]"
             />
           </div>
 
           {/* Ward & Category */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-bold text-slate-800 mb-1">
-                {t.wardLabel} <span className="text-rose-500">*</span>
+              <label className="block text-xs font-serif font-bold text-[#24211e] mb-1">
+                {t.wardLabel} <span className="text-rose-700">*</span>
               </label>
               <select
                 value={ward}
                 onChange={(e) => setWard(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs font-bold text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#0f2942]"
+                className="w-full bg-[#fbf9f4] border border-[#c4b6a3] rounded-sm px-3 py-2 text-xs font-bold text-[#24211e] focus:outline-none focus:border-[#24211e]"
               >
                 {WARDS_LIST.filter(w => w !== 'All Wards').map(w => (
                   <option key={w} value={w}>{getWardName(w)}</option>
@@ -156,13 +156,13 @@ export const NewIssueModal: React.FC<NewIssueModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-800 mb-1">
-                {t.categoryLabel} <span className="text-rose-500">*</span>
+              <label className="block text-xs font-serif font-bold text-[#24211e] mb-1">
+                {t.categoryLabel} <span className="text-rose-700">*</span>
               </label>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value as IssueCategory)}
-                className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs font-bold text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#0f2942]"
+                className="w-full bg-[#fbf9f4] border border-[#c4b6a3] rounded-sm px-3 py-2 text-xs font-bold text-[#24211e] focus:outline-none focus:border-[#24211e]"
               >
                 {CATEGORIES_LIST.filter(c => c !== 'All Categories').map(c => (
                   <option key={c} value={c}>{getCategoryName(c)}</option>
@@ -173,8 +173,8 @@ export const NewIssueModal: React.FC<NewIssueModalProps> = ({
 
           {/* Landmark */}
           <div>
-            <label className="block text-xs font-bold text-slate-800 mb-1">
-              {t.landmarkLabel} <span className="text-rose-500">*</span>
+            <label className="block text-xs font-serif font-bold text-[#24211e] mb-1">
+              {t.landmarkLabel} <span className="text-rose-700">*</span>
             </label>
             <input
               type="text"
@@ -182,27 +182,27 @@ export const NewIssueModal: React.FC<NewIssueModalProps> = ({
               value={landmark}
               onChange={(e) => setLandmark(e.target.value)}
               placeholder={t.landmarkPlaceholder}
-              className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-[#0f2942]"
+              className="w-full bg-[#fbf9f4] border border-[#c4b6a3] rounded-sm px-3 py-2 text-xs font-medium text-[#24211e] placeholder:text-[#8c8275] focus:outline-none focus:border-[#24211e]"
             />
           </div>
 
           {/* Dynamic Weight Sliders Box */}
-          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+          <div className="p-4 rounded-sm bg-[#f7f3ec] border border-[#e3dacd] space-y-3">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5 text-xs font-bold text-[#0f2942]">
-                <BrainCircuit className="w-4 h-4 text-[#0f2942]" />
+              <div className="flex items-center gap-1.5 text-xs font-serif font-bold text-[#24211e]">
+                <BrainCircuit className="w-4 h-4 text-[#6b2d18]" />
                 <span>{t.priorityScoringFactors}</span>
               </div>
-              <div className="px-2.5 py-1 rounded-lg bg-[#0f2942] text-amber-300 text-xs font-mono font-black shadow-xs">
+              <div className="gazette-stamp gazette-stamp-high">
                 {t.computedUrgency}: {computedUrgencyScore}/100
               </div>
             </div>
 
             {/* Safety Risk */}
             <div>
-              <div className="flex justify-between text-xs text-slate-700 font-bold mb-1">
+              <div className="flex justify-between text-xs text-[#24211e] font-bold mb-1">
                 <span>{t.safetyHazardSlider}:</span>
-                <span className="font-mono font-black text-rose-600">{safetyRisk}</span>
+                <span className="font-mono font-black text-rose-800">{safetyRisk}</span>
               </div>
               <input
                 type="range"
@@ -210,15 +210,15 @@ export const NewIssueModal: React.FC<NewIssueModalProps> = ({
                 max="100"
                 value={safetyRisk}
                 onChange={(e) => setSafetyRisk(Number(e.target.value))}
-                className="w-full accent-rose-600 h-1.5 bg-slate-200 rounded-lg cursor-pointer"
+                className="w-full accent-rose-700 h-1.5 bg-[#e3dacd] rounded-sm cursor-pointer"
               />
             </div>
 
             {/* Citizen Reports */}
             <div>
-              <div className="flex justify-between text-xs text-slate-700 font-bold mb-1">
+              <div className="flex justify-between text-xs text-[#24211e] font-bold mb-1">
                 <span>{t.citizenReportsSlider}:</span>
-                <span className="font-mono font-black text-blue-600">{citizenReports} {language === 'mr' ? 'तक्रारी' : 'reports'}</span>
+                <span className="font-mono font-black text-blue-800">{citizenReports} {language === 'mr' ? 'तक्रारी' : 'reports'}</span>
               </div>
               <input
                 type="range"
@@ -226,15 +226,15 @@ export const NewIssueModal: React.FC<NewIssueModalProps> = ({
                 max="50"
                 value={citizenReports}
                 onChange={(e) => setCitizenReports(Number(e.target.value))}
-                className="w-full accent-blue-600 h-1.5 bg-slate-200 rounded-lg cursor-pointer"
+                className="w-full accent-blue-700 h-1.5 bg-[#e3dacd] rounded-sm cursor-pointer"
               />
             </div>
 
             {/* Critical Facility Proximity */}
             <div>
-              <div className="flex justify-between text-xs text-slate-700 font-bold mb-1">
+              <div className="flex justify-between text-xs text-[#24211e] font-bold mb-1">
                 <span>{t.proximitySlider}:</span>
-                <span className="font-mono font-black text-emerald-600">{facilityProximity}</span>
+                <span className="font-mono font-black text-emerald-800">{facilityProximity}</span>
               </div>
               <input
                 type="range"
@@ -242,7 +242,7 @@ export const NewIssueModal: React.FC<NewIssueModalProps> = ({
                 max="100"
                 value={facilityProximity}
                 onChange={(e) => setFacilityProximity(Number(e.target.value))}
-                className="w-full accent-emerald-600 h-1.5 bg-slate-200 rounded-lg cursor-pointer"
+                className="w-full accent-emerald-700 h-1.5 bg-[#e3dacd] rounded-sm cursor-pointer"
               />
             </div>
           </div>
@@ -250,25 +250,25 @@ export const NewIssueModal: React.FC<NewIssueModalProps> = ({
           {/* Resources Input */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-bold text-slate-800 mb-1">
+              <label className="block text-xs font-serif font-bold text-[#24211e] mb-1">
                 {t.estimatedCostLabel}
               </label>
               <input
                 type="number"
                 value={estimatedCost}
                 onChange={(e) => setEstimatedCost(Number(e.target.value))}
-                className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs font-mono font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-[#0f2942]"
+                className="w-full bg-[#fbf9f4] border border-[#c4b6a3] rounded-sm px-3 py-2 text-xs font-mono font-bold text-[#24211e] focus:outline-none focus:border-[#24211e]"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-800 mb-1">
+              <label className="block text-xs font-serif font-bold text-[#24211e] mb-1">
                 {t.estimatedCrewHoursLabel}
               </label>
               <input
                 type="number"
                 value={estimatedCrewHours}
                 onChange={(e) => setEstimatedCrewHours(Number(e.target.value))}
-                className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs font-mono font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-[#0f2942]"
+                className="w-full bg-[#fbf9f4] border border-[#c4b6a3] rounded-sm px-3 py-2 text-xs font-mono font-bold text-[#24211e] focus:outline-none focus:border-[#24211e]"
               />
             </div>
           </div>
@@ -278,13 +278,13 @@ export const NewIssueModal: React.FC<NewIssueModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-bold text-slate-700 hover:text-slate-900 bg-white border border-slate-300 hover:bg-slate-50 rounded-lg"
+              className="px-4 py-2 text-xs font-mono font-bold text-[#59534c] hover:text-[#24211e] bg-[#f4efe6] border border-[#c4b6a3] hover:bg-[#e7e0d6] rounded-sm uppercase cursor-pointer"
             >
               {t.btnCancel}
             </button>
             <button
               type="submit"
-              className="px-5 py-2 text-xs font-bold text-white bg-[#0f2942] hover:bg-[#1e3a8a] rounded-lg transition-all shadow-xs flex items-center gap-1.5"
+              className="px-5 py-2 text-xs font-mono font-bold text-[#fffdfa] bg-[#24211e] hover:bg-[#3a352e] rounded-sm transition-all shadow-xs border border-black flex items-center gap-1.5 uppercase cursor-pointer"
             >
               <Sparkles className="w-4 h-4 text-amber-400" />
               {t.btnComputeRankAndIngest}

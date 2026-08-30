@@ -1,0 +1,96 @@
+/* Official Municipal Gazette Design Tokens */
+@import "tailwindcss";
+
+:root {
+  /* Parchment & Paper Backgrounds */
+  --gazette-bg: #fbf9f4;
+  --gazette-card-bg: #fffdfa;
+  --gazette-card-hover: #f7f3ec;
+  --gazette-header-bg: #f2ece1;
+  --gazette-sidebar-bg: #f5efe4;
+  
+  /* Ink Colors */
+  --gazette-ink-main: #24211e;
+  --gazette-ink-subtle: #59534c;
+  --gazette-ink-muted: #8c8275;
+  --gazette-ink-accent: #6b2d18;
+
+  /* Gazette Borders */
+  --gazette-border: #e3dacd;
+  --gazette-border-strong: #c4b6a3;
+  --gazette-border-dark: #3a352e;
+
+  /* Official Ink Stamp Tier Colors */
+  --stamp-critical-bg: #fef2f2;
+  --stamp-critical-text: #991b1b;
+  --stamp-critical-border: #991b1b;
+
+  --stamp-high-bg: #fff7ed;
+  --stamp-high-text: #c2410c;
+  --stamp-high-border: #c2410c;
+
+  --stamp-medium-bg: #f0fdf4;
+  --stamp-medium-text: #15803d;
+  --stamp-medium-border: #15803d;
+
+  --stamp-low-bg: #eff6ff;
+  --stamp-low-text: #1d4ed8;
+  --stamp-low-border: #1d4ed8;
+
+  --stamp-override-bg: #faf5ff;
+  --stamp-override-text: #6b21a8;
+  --stamp-override-border: #6b21a8;
+}
+
+/* Rotated Ink Stamp Badge Effect */
+.gazette-stamp {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.2rem 0.55rem;
+  font-family: "Courier New", "JetBrains Mono", monospace;
+  font-weight: 800;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-width: 2px;
+  border-style: solid;
+  border-radius: 2px;
+  box-shadow: 1px 1px 0px rgba(0,0,0,0.06);
+  transition: transform 0.15s ease-in-out;
+}
+
+.gazette-stamp-critical {
+  background-color: var(--stamp-critical-bg);
+  color: var(--stamp-critical-text);
+  border-color: var(--stamp-critical-border);
+  transform: rotate(-2.5deg);
+}
+
+.gazette-stamp-high {
+  background-color: var(--stamp-high-bg);
+  color: var(--stamp-high-text);
+  border-color: var(--stamp-high-border);
+  transform: rotate(1.8deg);
+}
+
+.gazette-stamp-medium {
+  background-color: var(--stamp-medium-bg);
+  color: var(--stamp-medium-text);
+  border-color: var(--stamp-medium-border);
+  transform: rotate(-1.2deg);
+}
+
+.gazette-stamp-low {
+  background-color: var(--stamp-low-bg);
+  color: var(--stamp-low-text);
+  border-color: var(--stamp-low-border);
+  transform: rotate(1.5deg);
+}
+
+.gazette-stamp-override {
+  background-color: var(--stamp-override-bg);
+  color: var(--stamp-override-text);
+  border-color: var(--stamp-override-border);
+  transform: rotate(-3deg);
+}
