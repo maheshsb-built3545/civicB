@@ -78,32 +78,86 @@ async function seed() {
   await adminUser.save();
   console.log('[Seed] ✅ Admin account seeded: admin@kopargaon.gov.in');
 
-  // --- Officer Account (matches DEMO_USERS.officer in AuthContext.tsx) ---
-  let officerUser = await UserModel.findOne({ email: 'officer@kopargaon.gov.in' });
-  if (officerUser) {
-    officerUser.name = 'Er. Rahul S. Patil';
-    officerUser.password = officerPassword;
-    officerUser.role = 'officer';
-    officerUser.roleTitle = 'Ward Executive Engineer (Ward 3)';
-    officerUser.roleTitleMr = 'वॉर्ड कार्यकारी अभियंता';
-    officerUser.ward = 'Ward 3 - Shivaji Chowk & Main Market';
-    officerUser.department = 'Civil Engineering & Road Infrastructure';
-    officerUser.badgeNumber = 'KMC-ENG-042';
-  } else {
-    officerUser = new UserModel({
-      name: 'Er. Rahul S. Patil',
-      email: 'officer@kopargaon.gov.in',
-      password: officerPassword,
-      role: 'officer',
-      roleTitle: 'Ward Executive Engineer (Ward 3)',
-      roleTitleMr: 'वॉर्ड कार्यकारी अभियंता',
+  // --- 3 DEDICATED OFFICERS (Scarcity Model Setup) ---
+  const OFFICERS_SEED = [
+    {
+      name: 'Ramesh (Ward 1)',
+      email: 'officer1@kopargaon.gov.in',
+      roleTitle: 'Ward Executive Officer (Ward 1)',
+      roleTitleMr: 'वॉर्ड अधिकारी (प्रभाग १)',
+      ward: 'Ward 1 - Gandhi Market & Old City',
+      department: 'Civil & Plumbing Division',
+      badgeNumber: 'KMC-OFF-001',
+      maxActiveTicketCapacity: 3,
+      specializations: ['general', 'plumbing']
+    },
+    {
+      name: 'Suresh (Ward 2)',
+      email: 'officer2@kopargaon.gov.in',
+      roleTitle: 'Ward Executive Officer (Ward 2)',
+      roleTitleMr: 'वॉर्ड अधिकारी (प्रभाग २)',
+      ward: 'Ward 2 - Kalika Nagar & Temple Zone',
+      department: 'Electrical Infrastructure',
+      badgeNumber: 'KMC-OFF-002',
+      maxActiveTicketCapacity: 2,
+      specializations: ['general', 'electrical']
+    },
+    {
+      name: 'Patil (Ward 3)',
+      email: 'officer3@kopargaon.gov.in',
+      roleTitle: 'Ward Executive Officer (Ward 3)',
+      roleTitleMr: 'वॉर्ड अधिकारी (प्रभाग ३)',
       ward: 'Ward 3 - Shivaji Chowk & Main Market',
-      department: 'Civil Engineering & Road Infrastructure',
-      badgeNumber: 'KMC-ENG-042',
-    });
+      department: 'Roads & Heavy Machinery',
+      badgeNumber: 'KMC-OFF-003',
+      maxActiveTicketCapacity: 4,
+      specializations: ['general', 'heavy_machinery']
+    },
+    // Also seed default officer@kopargaon.gov.in pointing to Officer 3 (Patil) for quick logins
+    {
+      name: 'Patil (Ward 3)',
+      email: 'officer@kopargaon.gov.in',
+      roleTitle: 'Ward Executive Officer (Ward 3)',
+      roleTitleMr: 'वॉर्ड अधिकारी (प्रभाग ३)',
+      ward: 'Ward 3 - Shivaji Chowk & Main Market',
+      department: 'Roads & Heavy Machinery',
+      badgeNumber: 'KMC-OFF-000',
+      maxActiveTicketCapacity: 4,
+      specializations: ['general', 'heavy_machinery']
+    }
+  ];
+
+  for (const off of OFFICERS_SEED) {
+    let officerUser = await UserModel.findOne({ email: off.email });
+    if (officerUser) {
+      officerUser.name = off.name;
+      officerUser.password = officerPassword;
+      officerUser.role = 'officer';
+      officerUser.roleTitle = off.roleTitle;
+      officerUser.roleTitleMr = off.roleTitleMr;
+      officerUser.ward = off.ward;
+      officerUser.department = off.department;
+      officerUser.badgeNumber = off.badgeNumber;
+      officerUser.maxActiveTicketCapacity = off.maxActiveTicketCapacity;
+      officerUser.specializations = off.specializations;
+    } else {
+      officerUser = new UserModel({
+        name: off.name,
+        email: off.email,
+        password: officerPassword,
+        role: 'officer',
+        roleTitle: off.roleTitle,
+        roleTitleMr: off.roleTitleMr,
+        ward: off.ward,
+        department: off.department,
+        badgeNumber: off.badgeNumber,
+        maxActiveTicketCapacity: off.maxActiveTicketCapacity,
+        specializations: off.specializations
+      });
+    }
+    await officerUser.save();
+    console.log(`[Seed] ✅ Officer account seeded: ${off.email} (${off.name})`);
   }
-  await officerUser.save();
-  console.log('[Seed] ✅ Officer account seeded: officer@kopargaon.gov.in');
 
   await mongoose.disconnect();
   console.log('[Seed] Done. Disconnected from MongoDB.');

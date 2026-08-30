@@ -67,17 +67,33 @@ router.post('/login', async (req: Request, res: Response) => {
 
     // Fallback mode (when DB is unconfigured in local preview)
     const isAdmin = cleanEmail === 'admin@kopargaon.gov.in';
-    const isOfficer = cleanEmail === 'officer@kopargaon.gov.in';
+    const isOfficer1 = cleanEmail === 'officer1@kopargaon.gov.in';
+    const isOfficer2 = cleanEmail === 'officer2@kopargaon.gov.in';
+    const isOfficer3 = cleanEmail === 'officer3@kopargaon.gov.in' || cleanEmail === 'officer@kopargaon.gov.in';
 
-    if (!isAdmin && !isOfficer) {
+    if (!isAdmin && !isOfficer1 && !isOfficer2 && !isOfficer3) {
       return res.status(401).json({ error: 'Invalid email or password.' });
     }
 
     const role = isAdmin ? 'admin' : 'officer';
-    const ward = isAdmin ? 'All Wards' : 'Ward 3 - Shivaji Chowk & Main Market';
+    const ward = isAdmin
+      ? 'All Wards'
+      : isOfficer1
+      ? 'Ward 1 - Gandhi Market & Old City'
+      : isOfficer2
+      ? 'Ward 2 - Kalika Nagar & Temple Zone'
+      : 'Ward 3 - Shivaji Chowk & Main Market';
+
+    const userId = isAdmin
+      ? 'ADM-001'
+      : isOfficer1
+      ? 'OFF-001'
+      : isOfficer2
+      ? 'OFF-002'
+      : 'OFF-003';
 
     const token = signToken({
-      userId: isAdmin ? 'ADM-001' : 'ENG-042',
+      userId,
       role,
       ward,
     });
@@ -94,16 +110,42 @@ router.post('/login', async (req: Request, res: Response) => {
       ward: 'All Wards',
       department: 'Urban Development & Municipal Governance',
       badgeNumber: 'KMC-CMO-001',
-    } : {
-      id: 'ENG-042',
-      name: 'Er. Rahul S. Patil',
-      email: 'officer@kopargaon.gov.in',
+    } : isOfficer1 ? {
+      id: 'OFF-001',
+      name: 'Ramesh (Ward 1)',
+      email: 'officer1@kopargaon.gov.in',
       role: 'officer' as const,
-      roleTitle: 'Ward Executive Engineer (Ward 3)',
-      roleTitleMr: 'वॉर्ड कार्यकारी अभियंता',
+      roleTitle: 'Ward Executive Officer (Ward 1)',
+      roleTitleMr: 'वॉर्ड अधिकारी (प्रभाग १)',
+      ward: 'Ward 1 - Gandhi Market & Old City',
+      department: 'Civil & Plumbing Division',
+      badgeNumber: 'KMC-OFF-001',
+      maxActiveTicketCapacity: 3,
+      specializations: ['general', 'plumbing']
+    } : isOfficer2 ? {
+      id: 'OFF-002',
+      name: 'Suresh (Ward 2)',
+      email: 'officer2@kopargaon.gov.in',
+      role: 'officer' as const,
+      roleTitle: 'Ward Executive Officer (Ward 2)',
+      roleTitleMr: 'वॉर्ड अधिकारी (प्रभाग २)',
+      ward: 'Ward 2 - Kalika Nagar & Temple Zone',
+      department: 'Electrical Infrastructure',
+      badgeNumber: 'KMC-OFF-002',
+      maxActiveTicketCapacity: 2,
+      specializations: ['general', 'electrical']
+    } : {
+      id: 'OFF-003',
+      name: 'Patil (Ward 3)',
+      email: cleanEmail,
+      role: 'officer' as const,
+      roleTitle: 'Ward Executive Officer (Ward 3)',
+      roleTitleMr: 'वॉर्ड अधिकारी (प्रभाग ३)',
       ward: 'Ward 3 - Shivaji Chowk & Main Market',
-      department: 'Civil Engineering & Road Infrastructure',
-      badgeNumber: 'KMC-ENG-042',
+      department: 'Roads & Heavy Machinery',
+      badgeNumber: 'KMC-OFF-003',
+      maxActiveTicketCapacity: 4,
+      specializations: ['general', 'heavy_machinery']
     };
 
     return res.json({ user: fallbackUser });

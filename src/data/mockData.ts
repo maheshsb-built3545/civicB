@@ -20,19 +20,7 @@ export const WARDS_LIST = [
   'All Wards',
   'Ward 1 - Gandhi Market & Old City',
   'Ward 2 - Kalika Nagar & Temple Zone',
-  'Ward 3 - Shivaji Chowk & Main Market',
-  'Ward 4 - Betkopargaon & Rural Health Link',
-  'Ward 5 - Subhash Nagar & Housing Colony',
-  'Ward 6 - Kaushlya Nagar & Residential Hub',
-  'Ward 7 - Station Road & Railway Feeder',
-  'Ward 8 - Samata Nagar & East Colony',
-  'Ward 9 - S.S.G.M. College Road & Vidyanagar',
-  'Ward 10 - Shardanagar & Educational Belt',
-  'Ward 11 - Kachehari Road & Court Complex',
-  'Ward 12 - Godavari Riverfront & Shirdi Link',
-  'Ward 13 - Singnapur & Bypass Link',
-  'Ward 14 - Mahadevnagar & Industrial Corridor',
-  'Ward 15 - Jeur Patoda & Suburban Link'
+  'Ward 3 - Shivaji Chowk & Main Market'
 ];
 
 export const CATEGORIES_LIST = [
@@ -120,15 +108,15 @@ export const INITIAL_ISSUES: CivicIssue[] = [
     isActionedThisCycle: true,
     isOverridden: false
   },
-  // TIED URGENCY CASE 1: Station Road (Raw Urgency: 84)
+  // TIED URGENCY CASE 1: Kalika Nagar (Raw Urgency: 84)
   {
     id: 'KPG-2026-0755',
     ticketNumber: 'KPG-0755',
-    title: 'Severe Deep Pothole Cluster on Railway Station Feeder Arterial',
+    title: 'Severe Deep Pothole Cluster on Temple Zone Arterial Road',
     description: 'Series of 6 large water-filled craters (avg depth 18cm) on main transit road causing two-wheeler skidding and auto-rickshaw damage.',
     category: 'Roads & Potholes',
-    ward: 'Ward 7 - Station Road & Railway Feeder',
-    locationLandmark: 'Near Malegaon Railway Overbridge Approach, Station Rd',
+    ward: 'Ward 2 - Kalika Nagar & Temple Zone',
+    locationLandmark: 'Near Kalika Mata Temple Approach Road',
     coordinates: { lat: 19.8965, lng: 74.4715 },
     latitude: 19.8965,
     longitude: 74.4715,
@@ -137,7 +125,7 @@ export const INITIAL_ISSUES: CivicIssue[] = [
     urgencyScore: 84,
     computedRank: 3,
     currentRank: 3,
-    justification: 'Ranked #3 (Tied Score: 84): Station Road won tie-breaker over Godavari Link due to higher rush-hour traffic density (18,000 PCU/day) and 3 documented two-wheeler injury incidents.',
+    justification: 'Ranked #3 (Tied Score: 84): Temple Zone road won tie-breaker due to higher rush-hour traffic density (18,000 PCU/day) and 3 documented two-wheeler injury incidents.',
     scoreBreakdown: {
       safetyRisk: 85,
       citizenReportsCount: 31,
@@ -145,9 +133,9 @@ export const INITIAL_ISSUES: CivicIssue[] = [
       daysOpen: 17,
       agingScore: 82,
       criticalFacilityProximityScore: 80,
-      facilityDetails: 'Kopargaon Railway Station (300m), ST Bus Stand feeder',
+      facilityDetails: 'Kalika Mata Temple (100m), ST Bus Stand feeder',
       tieBreakerApplied: true,
-      tieBreakerReason: 'Higher transit volume and reported pedestrian/motorcycle casualty risk compared to Ward 12 issue.'
+      tieBreakerReason: 'Higher transit volume and reported pedestrian/motorcycle casualty risk.'
     },
     estimatedCostInr: 120000,
     estimatedCrewHours: 24,
@@ -160,15 +148,15 @@ export const INITIAL_ISSUES: CivicIssue[] = [
     isActionedThisCycle: true,
     isOverridden: false
   },
-  // TIED URGENCY CASE 2: Godavari Riverfront (Raw Urgency: 84 - Ranked #4 via Tiebreaker)
+  // TIED URGENCY CASE 2: Gandhi Market (Raw Urgency: 84 - Ranked #4 via Tiebreaker)
   {
     id: 'KPG-2026-0761',
     ticketNumber: 'KPG-0761',
-    title: 'Stormwater Culvert Retaining Wall Subsidence & Riverfront Silt Overflow',
-    description: 'Heavy rains cracked storm culvert wing-wall; silt backing up onto the Shirdi Pilgrimage connector corridor.',
+    title: 'Stormwater Culvert Retaining Wall Subsidence & Silt Overflow',
+    description: 'Heavy rains cracked storm culvert wing-wall; silt backing up onto the main market connector corridor.',
     category: 'Drainage & Sewage',
-    ward: 'Ward 12 - Godavari Riverfront & Shirdi Link',
-    locationLandmark: 'Godavari Ghat Road, Near Old Bridge Chowki',
+    ward: 'Ward 1 - Gandhi Market & Old City',
+    locationLandmark: 'Gandhi Market Entrance Chowki',
     coordinates: { lat: 19.8821, lng: 74.4876 },
     latitude: 19.8821,
     longitude: 74.4876,
@@ -177,7 +165,7 @@ export const INITIAL_ISSUES: CivicIssue[] = [
     urgencyScore: 84,
     computedRank: 4,
     currentRank: 4,
-    justification: 'Ranked #4 (Tied Score: 84): High flood hazard on pilgrim bypass route. Seeded behind Ward 7 because acute accident risk in station transit corridor is higher this cycle.',
+    justification: 'Ranked #4 (Tied Score: 84): High flood hazard on market bypass route.',
     scoreBreakdown: {
       safetyRisk: 82,
       citizenReportsCount: 24,
@@ -185,9 +173,9 @@ export const INITIAL_ISSUES: CivicIssue[] = [
       daysOpen: 15,
       agingScore: 84,
       criticalFacilityProximityScore: 84,
-      facilityDetails: 'Ghat Pilgrimage Walkway, Shirdi State Highway Link',
+      facilityDetails: 'Old City Walkway, Main Market Link',
       tieBreakerApplied: true,
-      tieBreakerReason: 'Deferred 1 rank below Ward 7 based on dynamic transit density metric.'
+      tieBreakerReason: 'Deferred 1 rank below Ward 2 based on dynamic transit density metric.'
     },
     estimatedCostInr: 210000,
     estimatedCrewHours: 42,
@@ -200,15 +188,15 @@ export const INITIAL_ISSUES: CivicIssue[] = [
     isActionedThisCycle: false,
     isOverridden: false
   },
-  // OVERRIDDEN CASE: College Road (Originally Algorithmic Rank #7 -> Manually Overridden to Rank #5 by Chief Municipal Officer)
+  // OVERRIDDEN CASE: Main Market (Originally Algorithmic Rank #7 -> Manually Overridden to Rank #5 by Chief Municipal Officer)
   {
     id: 'KPG-2026-0689',
     ticketNumber: 'KPG-0689',
-    title: 'Collapsed Drain Slab & Open Trench Outside College Examination Center',
+    title: 'Collapsed Drain Slab & Open Trench Outside Main Market',
     description: 'RCC stormwater slab caved under delivery vehicle. Leaves a 1.2m open pit directly on the student walkway.',
     category: 'Public Safety & Structural',
-    ward: 'Ward 9 - S.S.G.M. College Road & Vidyanagar',
-    locationLandmark: 'Outside Main Gate 2, S.S.G.M. Science & Commerce College',
+    ward: 'Ward 3 - Shivaji Chowk & Main Market',
+    locationLandmark: 'Main Market Gate 2',
     coordinates: { lat: 19.9045, lng: 74.4690 },
     latitude: 19.9045,
     longitude: 74.4690,
@@ -217,7 +205,7 @@ export const INITIAL_ISSUES: CivicIssue[] = [
     urgencyScore: 78,
     computedRank: 7,
     currentRank: 5,
-    justification: 'Ranked #5 (OVERRIDDEN from #7): Officer override applied. University examinations commencing Sept 2nd with 3,500 daily student footfall; safety risk elevated manually.',
+    justification: 'Ranked #5 (OVERRIDDEN from #7): Officer override applied. High market footfall; safety risk elevated manually.',
     scoreBreakdown: {
       safetyRisk: 79,
       citizenReportsCount: 16,
@@ -225,7 +213,7 @@ export const INITIAL_ISSUES: CivicIssue[] = [
       daysOpen: 19,
       agingScore: 80,
       criticalFacilityProximityScore: 92,
-      facilityDetails: 'S.S.G.M. College Main Campus (5m), Vidyanagar Bus Stop'
+      facilityDetails: 'Main Market Complex (5m)'
     },
     estimatedCostInr: 95000,
     estimatedCrewHours: 20,
@@ -240,29 +228,29 @@ export const INITIAL_ISSUES: CivicIssue[] = [
     overrideDetails: {
       originalRank: 7,
       newRank: 5,
-      reason: 'Urgent protocol: SPPU University semester exams commence Sept 2nd. Over 3,500 students passing this gate daily. Must fix before exam session.',
+      reason: 'Urgent protocol: High market footfall during festival season. Must fix immediately.',
       category: 'Public Event / Time-Sensitive Risk',
       officerName: 'Er. Sanjay R. Deshmukh',
       officerRole: 'Chief Municipal Officer (CMO)',
       timestamp: '2026-08-27 11:30 AM'
     }
   },
-  // LOW CONFIDENCE / INCOMPLETE DATA CASE: Subhash Nagar (Needs Review)
+  // LOW CONFIDENCE / INCOMPLETE DATA CASE: Ward 1 (Needs Review)
   {
     id: 'KPG-2026-0830',
     ticketNumber: 'KPG-0830',
-    title: 'Reported Sewage Backflow & Overflowing Trash Dump Behind Colony',
+    title: 'Reported Sewage Backflow & Overflowing Trash Dump Behind Alley',
     description: 'Citizen report of sewage seepage into residential alley with stray animal scavenging. Submitted via citizen WhatsApp bot with no geotag or clear daytime photo.',
     category: 'Solid Waste Management',
-    ward: 'Ward 5 - Subhash Nagar & Housing Colony',
-    locationLandmark: 'Lane 4, Behind Datta Mandir / Community Hall',
-    coordinates: undefined, // missing coordinates
+    ward: 'Ward 1 - Gandhi Market & Old City',
+    locationLandmark: 'Lane 4, Behind Old City Community Hall',
+    coordinates: undefined,
     reportedDate: '2026-08-26',
     daysOpen: 3,
     urgencyScore: 72,
     computedRank: 6,
     currentRank: 6,
-    justification: 'Flagged for Field Verification: Preliminary urgency calculated at 72, but marked LOW DATA CONFIDENCE (38%). Missing verified GPS coords and photo is blurry night capture. Assigned to Ward Inspector for site check.',
+    justification: 'Flagged for Field Verification: Preliminary urgency calculated at 72, but marked LOW DATA CONFIDENCE (38%). Missing verified GPS coords.',
     scoreBreakdown: {
       safetyRisk: 70,
       citizenReportsCount: 3,
@@ -270,7 +258,7 @@ export const INITIAL_ISSUES: CivicIssue[] = [
       daysOpen: 3,
       agingScore: 45,
       criticalFacilityProximityScore: 60,
-      facilityDetails: 'Datta Mandir Community Hall'
+      facilityDetails: 'Old City Community Hall'
     },
     estimatedCostInr: 65000,
     estimatedCrewHours: 16,
@@ -291,11 +279,11 @@ export const INITIAL_ISSUES: CivicIssue[] = [
   {
     id: 'KPG-2026-0780',
     ticketNumber: 'KPG-0780',
-    title: 'Broken Storm Drain Grating & Curb Collapse on Hospital Road',
-    description: 'Cast iron stormwater grating stolen/damaged; open gap catching ambulance tires and wheelchair access ramp.',
+    title: 'Broken Storm Drain Grating & Curb Collapse in Temple Zone',
+    description: 'Cast iron stormwater grating stolen/damaged; open gap catching vehicle tires.',
     category: 'Public Safety & Structural',
-    ward: 'Ward 4 - Betkopargaon & Rural Health Link',
-    locationLandmark: '50m from Sub-District Rural Hospital Main Entrance',
+    ward: 'Ward 2 - Kalika Nagar & Temple Zone',
+    locationLandmark: '50m from Temple Zone Entrance',
     coordinates: { lat: 19.8790, lng: 74.4920 },
     latitude: 19.8790,
     longitude: 74.4920,
@@ -304,7 +292,7 @@ export const INITIAL_ISSUES: CivicIssue[] = [
     urgencyScore: 68,
     computedRank: 7,
     currentRank: 7,
-    justification: 'Ranked #7: Medium-high safety issue directly on emergency ambulance ingress route. Moderate cost and quick crew turnaround.',
+    justification: 'Ranked #7: Medium-high safety issue on temple ingress route.',
     scoreBreakdown: {
       safetyRisk: 75,
       citizenReportsCount: 12,
@@ -312,14 +300,14 @@ export const INITIAL_ISSUES: CivicIssue[] = [
       daysOpen: 13,
       agingScore: 68,
       criticalFacilityProximityScore: 98,
-      facilityDetails: 'Sub-District Rural Hospital (50m)'
+      facilityDetails: 'Kalika Temple Zone Entrance (50m)'
     },
     estimatedCostInr: 38000,
     estimatedCrewHours: 8,
     requiredEquipment: ['Heavy Duty Steel Grate Install Kit', 'Welding Rig'],
     dataConfidence: 'high',
     dataQualityScore: 88,
-    dataQualityFlags: ['Verified by Hospital Medical Superintendent Notice'],
+    dataQualityFlags: ['Verified by Ward Officer Notice'],
     needsReview: false,
     status: 'ranked',
     isActionedThisCycle: false,
@@ -328,11 +316,11 @@ export const INITIAL_ISSUES: CivicIssue[] = [
   {
     id: 'KPG-2026-0740',
     ticketNumber: 'KPG-0740',
-    title: 'Recurring Low Pressure & Contamination In East Colony Pipeline',
+    title: 'Recurring Low Pressure & Contamination In Main Market Pipeline',
     description: 'Intermittent muddy water output reported across 3 streets during morning supply slot; valve chamber silted up.',
     category: 'Water Supply',
-    ward: 'Ward 8 - Samata Nagar & East Colony',
-    locationLandmark: 'Samata Nagar Water Tank Junction, Cross Road 3',
+    ward: 'Ward 3 - Shivaji Chowk & Main Market',
+    locationLandmark: 'Main Market Water Tank Junction',
     coordinates: { lat: 19.8930, lng: 74.4950 },
     latitude: 19.8930,
     longitude: 74.4950,
@@ -341,7 +329,7 @@ export const INITIAL_ISSUES: CivicIssue[] = [
     urgencyScore: 62,
     computedRank: 8,
     currentRank: 8,
-    justification: 'Ranked #8: Chronic low-pressure water quality complaint open 21 days. Requires sluice valve flush and gasket replacement.',
+    justification: 'Ranked #8: Chronic low-pressure water quality complaint open 21 days.',
     scoreBreakdown: {
       safetyRisk: 58,
       citizenReportsCount: 19,
@@ -349,7 +337,7 @@ export const INITIAL_ISSUES: CivicIssue[] = [
       daysOpen: 21,
       agingScore: 92,
       criticalFacilityProximityScore: 50,
-      facilityDetails: 'Z.P. School #4 (350m)'
+      facilityDetails: 'Shivaji Chowk School (350m)'
     },
     estimatedCostInr: 52000,
     estimatedCrewHours: 12,
@@ -365,11 +353,11 @@ export const INITIAL_ISSUES: CivicIssue[] = [
   {
     id: 'KPG-2026-0710',
     ticketNumber: 'KPG-0710',
-    title: 'Complete Dark Stretch on Kachehari Court Road (8 Streetlights Down)',
+    title: 'Complete Dark Stretch on Gandhi Market Road (8 Streetlights Down)',
     description: 'Underground junction short circuit causing 300m stretch to remain pitch dark; safety risk for late-night commuters.',
     category: 'Streetlights & Electrical',
-    ward: 'Ward 11 - Kachehari Road & Court Complex',
-    locationLandmark: 'Civil Court Boundary Wall to Tehsil Office Gate',
+    ward: 'Ward 1 - Gandhi Market & Old City',
+    locationLandmark: 'Gandhi Market Main Gate',
     coordinates: { lat: 19.8890, lng: 74.4750 },
     latitude: 19.8890,
     longitude: 74.4750,
@@ -378,7 +366,7 @@ export const INITIAL_ISSUES: CivicIssue[] = [
     urgencyScore: 56,
     computedRank: 9,
     currentRank: 9,
-    justification: 'Ranked #9: Extended aging complaint (24 days). Underground cable fault identified; requires trenching and replacement.',
+    justification: 'Ranked #9: Extended aging complaint (24 days). Underground cable fault identified.',
     scoreBreakdown: {
       safetyRisk: 55,
       citizenReportsCount: 14,
@@ -386,7 +374,7 @@ export const INITIAL_ISSUES: CivicIssue[] = [
       daysOpen: 24,
       agingScore: 95,
       criticalFacilityProximityScore: 65,
-      facilityDetails: 'Tehsil Office, Post Office'
+      facilityDetails: 'Gandhi Market Area'
     },
     estimatedCostInr: 68000,
     estimatedCrewHours: 18,
